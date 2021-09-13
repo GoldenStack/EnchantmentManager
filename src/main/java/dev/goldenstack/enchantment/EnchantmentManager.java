@@ -103,7 +103,7 @@ public class EnchantmentManager {
         this.enchantability.remove(material);
     }
 
-    public Builder builder(){
+    public static @NotNull Builder builder(){
         return new Builder();
     }
 
