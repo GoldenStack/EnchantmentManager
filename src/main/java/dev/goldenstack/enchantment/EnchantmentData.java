@@ -1,6 +1,7 @@
 package dev.goldenstack.enchantment;
 
 import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -75,9 +76,75 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
             Map.entry(Enchantment.INFINITY, new EnchantmentData(Enchantment.INFINITY, 1, SlotType::BOW, multiply(20), constant(50), Enchantment.MENDING)),
             Map.entry(Enchantment.FORTUNE, new EnchantmentData(Enchantment.FORTUNE, 2, SlotType::TOOL, adjusted(15, 9), addToDefault(50), Enchantment.SILK_TOUCH)),
             Map.entry(Enchantment.MULTISHOT, new EnchantmentData(Enchantment.MULTISHOT, 2, SlotType::CROSSBOW, multiply(20), constant(50), Enchantment.PIERCING)),
-            Map.entry(Enchantment.CHANNELING, new EnchantmentData(Enchantment.CHANNELING, 1, SlotType::TRIDENT, multiply(25), constant(50))));
+            Map.entry(Enchantment.CHANNELING, new EnchantmentData(Enchantment.CHANNELING, 1, SlotType::TRIDENT, multiply(25), constant(50)))
+    );
+
+    // IntelliJ helpfully informed me that not including these supposedly "redundant" type arguments could slow down
+    // compilation and analysis!
+    @SuppressWarnings("RedundantTypeArguments")
+    private static final @NotNull Map<Material, Integer> DEFAULT_ENCHANTABILITY = Map.<Material, Integer>ofEntries(
+            Map.entry(Material.TRIDENT, 1),
+            Map.entry(Material.BOOK, 1),
+            Map.entry(Material.FISHING_ROD, 1),
+            Map.entry(Material.BOW, 1),
+            Map.entry(Material.CROSSBOW, 1),
+            Map.entry(Material.LEATHER_HELMET, 15),
+            Map.entry(Material.LEATHER_CHESTPLATE, 15),
+            Map.entry(Material.LEATHER_LEGGINGS, 15),
+            Map.entry(Material.LEATHER_BOOTS, 15),
+            Map.entry(Material.CHAINMAIL_HELMET, 12),
+            Map.entry(Material.CHAINMAIL_CHESTPLATE, 12),
+            Map.entry(Material.CHAINMAIL_LEGGINGS, 12),
+            Map.entry(Material.CHAINMAIL_BOOTS, 12),
+            Map.entry(Material.IRON_HELMET, 9),
+            Map.entry(Material.IRON_CHESTPLATE, 9),
+            Map.entry(Material.IRON_LEGGINGS, 9),
+            Map.entry(Material.IRON_BOOTS, 9),
+            Map.entry(Material.GOLDEN_HELMET, 25),
+            Map.entry(Material.GOLDEN_CHESTPLATE, 25),
+            Map.entry(Material.GOLDEN_LEGGINGS, 25),
+            Map.entry(Material.GOLDEN_BOOTS, 25),
+            Map.entry(Material.DIAMOND_HELMET, 10),
+            Map.entry(Material.DIAMOND_CHESTPLATE, 10),
+            Map.entry(Material.DIAMOND_LEGGINGS, 10),
+            Map.entry(Material.DIAMOND_BOOTS, 10),
+            Map.entry(Material.TURTLE_HELMET, 9),
+            Map.entry(Material.NETHERITE_HELMET, 15),
+            Map.entry(Material.NETHERITE_CHESTPLATE, 15),
+            Map.entry(Material.NETHERITE_LEGGINGS, 15),
+            Map.entry(Material.NETHERITE_BOOTS, 15),
+            Map.entry(Material.WOODEN_SWORD, 15),
+            Map.entry(Material.WOODEN_PICKAXE, 15),
+            Map.entry(Material.WOODEN_AXE, 15),
+            Map.entry(Material.WOODEN_SHOVEL, 15),
+            Map.entry(Material.WOODEN_HOE, 15),
+            Map.entry(Material.STONE_SWORD, 5),
+            Map.entry(Material.STONE_PICKAXE, 5),
+            Map.entry(Material.STONE_AXE, 5),
+            Map.entry(Material.STONE_SHOVEL, 5),
+            Map.entry(Material.STONE_HOE, 5),
+            Map.entry(Material.IRON_SWORD, 14),
+            Map.entry(Material.IRON_PICKAXE, 14),
+            Map.entry(Material.IRON_AXE, 14),
+            Map.entry(Material.IRON_SHOVEL, 14),
+            Map.entry(Material.IRON_HOE, 14),
+            Map.entry(Material.DIAMOND_SWORD, 10),
+            Map.entry(Material.DIAMOND_PICKAXE, 10),
+            Map.entry(Material.DIAMOND_AXE, 10),
+            Map.entry(Material.DIAMOND_SHOVEL, 10),
+            Map.entry(Material.DIAMOND_HOE, 10),
+            Map.entry(Material.NETHERITE_SWORD, 15),
+            Map.entry(Material.NETHERITE_PICKAXE, 15),
+            Map.entry(Material.NETHERITE_AXE, 15),
+            Map.entry(Material.NETHERITE_SHOVEL, 15),
+            Map.entry(Material.NETHERITE_HOE, 15)
+    );
 
     public static @NotNull Map<Enchantment, EnchantmentData> getDefaultData(){
         return DEFAULT_DATA;
+    }
+
+    public static @NotNull Map<Material, Integer> getDefaultEnchantability(){
+        return DEFAULT_ENCHANTABILITY;
     }
 }
