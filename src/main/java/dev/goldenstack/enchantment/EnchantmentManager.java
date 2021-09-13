@@ -103,10 +103,16 @@ public class EnchantmentManager {
         this.enchantability.remove(material);
     }
 
+    public Builder builder(){
+        return new Builder();
+    }
+
     public static class Builder {
         private boolean useConcurrentHashMap = false,
                         useDefaultEnchantmentData = true,
                         useDefaultEnchantability = true;
+
+        private Builder(){}
 
         @Contract("_ -> this")
         public @NotNull Builder useConcurrentHashMap(boolean useConcurrentHashMap) {
