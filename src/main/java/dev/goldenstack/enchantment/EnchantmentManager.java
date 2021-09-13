@@ -107,6 +107,9 @@ public class EnchantmentManager {
         return new Builder();
     }
 
+    /**
+     * Utility class for building EnchantmentManager instances
+     */
     public static class Builder {
         private boolean useConcurrentHashMap = false,
                         useDefaultEnchantmentData = true,
@@ -114,25 +117,43 @@ public class EnchantmentManager {
 
         private Builder(){}
 
+        /**
+         * <p>When true, sets the {@code data} and {@code enchantability} maps to ConcurrentHashMaps when they
+         * get initialized instead of normal HashMaps.</p>
+         * <p>Default: {@code false}</p>
+         */
         @Contract("_ -> this")
         public @NotNull Builder useConcurrentHashMap(boolean useConcurrentHashMap) {
             this.useConcurrentHashMap = useConcurrentHashMap;
             return this;
         }
 
+        /**
+         * <p>When true, makes the built EnchantmentManager automatically add the default enchantment data from
+         * {@link EnchantmentData#getDefaultData()} when the {@code data} map gets initialized.</p>
+         * <p>Default: {@code true}</p>
+         */
         @Contract("_ -> this")
         public @NotNull Builder useDefaultEnchantmentData(boolean useDefaultEnchantmentData) {
             this.useDefaultEnchantmentData = useDefaultEnchantmentData;
             return this;
         }
 
+        /**
+         * When true, makes the built EnchantmentManager automatically add the default enchantability data from
+         * {@link EnchantmentData#getDefaultEnchantability()} when the {@code enchantability} map gets initialized.
+         * <p>Default: {@code true}</p>
+         */
         @Contract("_ -> this")
         public @NotNull Builder useDefaultEnchantability(boolean useDefaultEnchantability) {
             this.useDefaultEnchantability = useDefaultEnchantability;
             return this;
         }
 
-        public @NotNull EnchantmentManager builder(){
+        /**
+         * Turns this builder into an EnchantmentManager
+         */
+        public @NotNull EnchantmentManager build(){
             return new EnchantmentManager(this);
         }
     }
