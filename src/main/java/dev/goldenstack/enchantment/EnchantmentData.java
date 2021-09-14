@@ -22,6 +22,17 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
         return this.maxLP.getLevel(this, level);
     }
 
+    /**
+     * Tests if this EnchantmentData's enchantment collides in some way with the other object's enchantment. An
+     * enchantment is considered to be colliding with another one's enchantment if:
+     * <ul>
+     *     <li>The enchantment is equal to the other object's enchantment</li>
+     *     <li>The enchantment is contained on the other object's list of incompatible enchantments</li>
+     *     <li>or the other object's enchantment is contained on this object's list of incompatible enchantments.</li>
+     * </ul>
+     * @param data The other EnchantmentData
+     * @return If this object's enchantment collides with the other's enchantment
+     */
     public boolean collidesWith(@NotNull EnchantmentData data){
         if (this.enchantment.equals(data.enchantment)){
             return true;
