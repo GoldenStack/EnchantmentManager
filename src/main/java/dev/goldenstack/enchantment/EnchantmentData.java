@@ -23,19 +23,19 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
     }
 
     public boolean collidesWith(@NotNull EnchantmentData data){
-        if (this.enchantment == data.enchantment){
+        if (this.enchantment.equals(data.enchantment)){
             return true;
         }
         if (this.incompatible.length != 0){
             for (Enchantment enchantment : this.incompatible){
-                if (enchantment == data.enchantment){
+                if (enchantment.equals(data.enchantment)){
                     return true;
                 }
             }
         }
         if (data.incompatible.length != 0){
             for (Enchantment enchantment : data.incompatible){
-                if (enchantment == this.enchantment){
+                if (enchantment.equals(this.enchantment)){
                     return true;
                 }
             }
