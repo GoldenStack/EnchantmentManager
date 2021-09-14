@@ -1,13 +1,14 @@
 package dev.goldenstack.enchantment;
 
 import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class EnchantmentManager {
     // Store builder and initialize data as null so we can lazily initialize values
@@ -19,6 +20,29 @@ public class EnchantmentManager {
         this.useConcurrentHashMap = builder.useConcurrentHashMap;
         this.useDefaultEnchantmentData = builder.useDefaultEnchantmentData;
         this.useDefaultEnchantability = builder.useDefaultEnchantability;
+    }
+
+
+    public @NotNull List<WeightedEnchant> getWeightedEnchantments(@NotNull ItemStack itemStack,
+                                                                  int levels, @NotNull Predicate<EnchantmentData> enchantmentPredicate,
+                                                                  @NotNull Predicate<ItemStack> alwaysAddPredicate){
+        List<WeightedEnchant> enchants = new ArrayList<>();
+        boolean addUnconditionally = alwaysAddPredicate.test(itemStack);
+        for (EnchantmentData data : this.getAllEnchantmentData()){
+            if (!enchantmentPredicate.test(data)){
+                continue;
+            }
+            if (!addUnconditionally && !data.slotType().canEnchant(itemStack)){
+                continue;
+            }
+            for (int i = (int) data.enchantment().registry().maxLevel(); i > 0; i --){
+                if (levels >= data.getMinimumLevel(i) && levels <= data.getMaximumLevel(i)){
+                    enchants.add(new WeightedEnchant(data, i));
+                    break;
+                }
+            }
+        }
+        return enchants;
     }
 
     private void initializeData(){
@@ -58,6 +82,16 @@ public class EnchantmentManager {
             return null;
         }
         return this.data.get(enchantment);
+    }
+
+    public @NotNull Collection<EnchantmentData> getAllEnchantmentData(){
+        if (this.data == null){
+            if (useDefaultEnchantmentData){
+                return EnchantmentData.getDefaultData().values();
+            }
+            return Collections.emptyList();
+        }
+        return this.data.values();
     }
 
     public void removeEnchantmentData(@NotNull Enchantment enchantment){
