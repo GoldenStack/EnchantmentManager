@@ -1,8 +1,10 @@
 package dev.goldenstack.enchantment;
 
 import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.ItemMetaBuilder;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.item.metadata.EnchantedBookMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +33,30 @@ public class EnchantmentManager {
         this.useConcurrentHashMap = builder.useConcurrentHashMap;
         this.useDefaultEnchantmentData = builder.useDefaultEnchantmentData;
         this.useDefaultEnchantability = builder.useDefaultEnchantability;
+    }
+
+    /**
+     * <p>Adds the enchantments from {@link #getEnchantsWithLevels(ItemStack, int, Random, Predicate, Predicate)} to the provided
+     * ItemStack. There's not really much to it, but it just converts the WeightedEnchants into a Map and then adds that to
+     * the ItemStack.</p>
+     * <p>Since this method only covers normal item meta and {@link EnchantedBookMeta}, if you have another custom meta
+     * that reacts differently to the {@link ItemMetaBuilder#enchantments(Map)} method, just
+     * rewrite this yourself - it's like 10 lines of code.</p>
+     * <b><p>For parameter information, please check the documentation of {@link #getEnchantsWithLevels(ItemStack, int, Random, Predicate, Predicate)}</p></b>
+     * @return The enchanted ItemStack
+     */
+    public @NotNull ItemStack enchantWithLevels(@NotNull ItemStack itemStack, int levels, @NotNull Random random,
+                                                @NotNull Predicate<EnchantmentData> enchantmentPredicate,
+                                                @NotNull Predicate<ItemStack> alwaysAddPredicate){
+        final Map<Enchantment, Short> enchantments = new HashMap<>();
+        for (WeightedEnchant enchant : getEnchantsWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate)){
+            enchantments.put(enchant.data().enchantment(), (short) enchant.level());
+        }
+
+        if (itemStack.getMeta() instanceof EnchantedBookMeta){
+            return itemStack.withMeta(EnchantedBookMeta.class, builder -> builder.enchantments(enchantments));
+        }
+        return itemStack.withMeta(builder -> builder.enchantments(enchantments));
     }
 
     /**
