@@ -8,6 +8,11 @@ import java.util.Map;
 
 import static dev.goldenstack.enchantment.LevelProvider.*;
 
+/**
+ * <p>Represents extra data about an enchantment that is specific to the EnchantmentManager it is represented in.</p>
+ * <p>Most people will want to use the default data or enchantability values from here, but you are always free to use
+ * your own.</p>
+ */
 public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
                               @NotNull LevelProvider minLP, @NotNull LevelProvider maxLP, @NotNull Enchantment@NotNull... incompatible) {
     public int getMinimumLevel(int level){

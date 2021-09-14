@@ -5,6 +5,10 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * <p>Represents the slot type of an enchantment.</p>
+ * <p>All the slot types in default Minecraft are defined here, but you are free to use your own!</p>
+ */
 public interface SlotType {
     boolean canEnchant(ItemStack itemStack);
 

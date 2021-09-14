@@ -2,6 +2,11 @@ package dev.goldenstack.enchantment;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * <p>Represents something that can provide an integer (usually a minimum/maximum level) based on the level and
+ * EnchantmentData that were provided.</p>
+ * <p>All the methods that default Minecraft uses to calculate level numbers are here, but you are free to use your own!</p>
+ */
 @FunctionalInterface
 public interface LevelProvider {
     int getLevel(@NotNull EnchantmentData data, int level);
