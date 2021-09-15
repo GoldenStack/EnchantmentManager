@@ -12,7 +12,26 @@ import java.util.List;
  * with this class directly.
  */
 @ApiStatus.Internal
-record WeightedEnchant(@NotNull EnchantmentData data, int level) implements WeightedRandomItem {
+class WeightedEnchant implements WeightedRandomItem {
+    private final @NotNull EnchantmentData data;
+    private final int level;
+    public WeightedEnchant(@NotNull EnchantmentData data, int level){
+        this.data = data;
+        this.level = level;
+    }
+
+    public @NotNull EnchantmentData data(){
+        return data;
+    }
+
+    public int level(){
+        return level;
+    }
+
+    @Override
+    public String toString() {
+        return "WeightedEnchant[data=" + data + ", level=" + level + "]";
+    }
 
     @Override
     public double getWeight() {

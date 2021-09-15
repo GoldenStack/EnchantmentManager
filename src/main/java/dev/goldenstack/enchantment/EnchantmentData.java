@@ -4,7 +4,9 @@ import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import static dev.goldenstack.enchantment.LevelProvider.*;
 
@@ -13,8 +15,35 @@ import static dev.goldenstack.enchantment.LevelProvider.*;
  * <p>Most people will want to use the default data or enchantability values from here, but you are always free to use
  * your own.</p>
  */
-public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
-                              @NotNull LevelProvider minLP, @NotNull LevelProvider maxLP, @NotNull Enchantment@NotNull... incompatible) {
+public class EnchantmentData {
+    private final @NotNull Enchantment enchantment;
+    private final int weight;
+    private final @NotNull SlotType slotType;
+    private final @NotNull LevelProvider minLP, maxLP;
+    private final @NotNull Enchantment[] incompatible;
+    public EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
+    @NotNull LevelProvider minLP, @NotNull LevelProvider maxLP, @NotNull Enchantment@NotNull... incompatible){
+        this.enchantment = enchantment;
+        this.weight = weight;
+        this.slotType = slotType;
+        this.maxLP = maxLP;
+        this.minLP = minLP;
+        this.incompatible = incompatible;
+    }
+
+    public @NotNull Enchantment enchantment(){
+        return enchantment;
+    }
+    public int weight(){
+        return weight;
+    }
+    public @NotNull SlotType slotType(){
+        return slotType;
+    }
+    public @NotNull Enchantment[] incompatible(){
+        return incompatible;
+    }
+
     public int getMinimumLevel(int level){
         return this.minLP.getLevel(this, level);
     }
@@ -52,6 +81,26 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
             }
         }
         return false;
+    }
+
+    public @NotNull String toString(){
+        return "EnchantmentData[enchantment=" + enchantment + ", weight=" + weight + ", slotType=" + slotType +
+                ", incompatible=" + Arrays.toString(this.incompatible) + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EnchantmentData that = (EnchantmentData) o;
+        return weight == that.weight && enchantment.equals(that.enchantment) && slotType.equals(that.slotType) && minLP.equals(that.minLP) && maxLP.equals(that.maxLP) && Arrays.equals(incompatible, that.incompatible);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(enchantment, weight, slotType, minLP, maxLP);
+        result = 31 * result + Arrays.hashCode(incompatible);
+        return result;
     }
 
     /**

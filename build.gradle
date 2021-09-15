@@ -2,6 +2,9 @@ plugins {
     id 'java'
 }
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 group 'dev.goldenstack.enchantment'
 version '1.0'
 
