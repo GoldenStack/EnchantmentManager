@@ -54,6 +54,20 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
         return false;
     }
 
+    /**
+     * @return The default (and immutable) map of default Enchantment -> EnchantmentData
+     */
+    public static @NotNull Map<Enchantment, EnchantmentData> getDefaultData(){
+        return DEFAULT_DATA;
+    }
+
+    /**
+     * @return The default (and immutable) map of default enchantability data
+     */
+    public static @NotNull Map<Material, Integer> getDefaultEnchantability(){
+        return DEFAULT_ENCHANTABILITY;
+    }
+
     private static final @NotNull Map<Enchantment, EnchantmentData> DEFAULT_DATA = Map.ofEntries(
             Map.entry(Enchantment.FIRE_PROTECTION, new EnchantmentData(Enchantment.FIRE_PROTECTION, 5, SlotType::ARMOR, adjusted(10, 8), addToMin(8), Enchantment.PROTECTION, Enchantment.BLAST_PROTECTION, Enchantment.PROJECTILE_PROTECTION)),
             Map.entry(Enchantment.KNOCKBACK, new EnchantmentData(Enchantment.KNOCKBACK, 5, SlotType::WEAPON, adjusted(5, 20), addToDefault(50))),
@@ -155,12 +169,4 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
             Map.entry(Material.NETHERITE_SHOVEL, 15),
             Map.entry(Material.NETHERITE_HOE, 15)
     );
-
-    public static @NotNull Map<Enchantment, EnchantmentData> getDefaultData(){
-        return DEFAULT_DATA;
-    }
-
-    public static @NotNull Map<Material, Integer> getDefaultEnchantability(){
-        return DEFAULT_ENCHANTABILITY;
-    }
 }

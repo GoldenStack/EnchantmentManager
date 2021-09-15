@@ -10,34 +10,59 @@ import org.jetbrains.annotations.NotNull;
  * <p>All the slot types in default Minecraft are defined here, but you are free to use your own!</p>
  */
 public interface SlotType {
+    /**
+     * @return True if the SlotType can accept the provided ItemStack, otherwise false
+     */
     boolean canEnchant(ItemStack itemStack);
 
+    /**
+     * @return True if the provided ItemStack's material is an armor piece
+     */
     static boolean ARMOR(@NotNull ItemStack itemStack){
         return itemStack.getMaterial().isArmor();
     }
 
+    /**
+     * @return True if the provided ItemStack's material can be worn in the player's helmet slot
+     */
     static boolean ARMOR_HELMET(@NotNull ItemStack itemStack){
         return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.HELMET;
     }
 
+    /**
+     * @return True if the provided ItemStack's material can be worn in the player's chestplate slot
+     */
     static boolean ARMOR_CHESTPLATE(@NotNull ItemStack itemStack){
         return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.CHESTPLATE;
     }
 
+    /**
+     * @return True if the provided ItemStack's material can be worn in the player's leggings slot
+     */
     static boolean ARMOR_LEGGINGS(@NotNull ItemStack itemStack){
         return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.LEGGINGS;
     }
 
+    /**
+     * @return True if the provided ItemStack's material can be worn in the player's boots slot
+     */
     static boolean ARMOR_FEET(@NotNull ItemStack itemStack){
         return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.BOOTS;
     }
 
+    /**
+     * @return True if the provided ItemStack's material is a sword. Yes, axes are weapons too, but this is an
+     * enchantment manager, not an anvil manager.
+     */
     static boolean WEAPON(@NotNull ItemStack itemStack){
         Material material = itemStack.getMaterial();
         return material == Material.WOODEN_SWORD || material == Material.STONE_SWORD || material == Material.IRON_SWORD ||
                material == Material.GOLDEN_SWORD || material == Material.DIAMOND_SWORD || material == Material.NETHERITE_SWORD;
     }
 
+    /**
+     * @return True if the provided ItemStack's material is any type of tool (pickaxe, axe, shovel, or hoe)
+     */
     static boolean TOOL(@NotNull ItemStack itemStack){
         Material material = itemStack.getMaterial();
         return  material == Material.WOODEN_PICKAXE || material == Material.WOODEN_AXE || material == Material.WOODEN_SHOVEL || material == Material.WOODEN_HOE ||
@@ -48,22 +73,48 @@ public interface SlotType {
                 material == Material.NETHERITE_PICKAXE || material == Material.NETHERITE_AXE || material == Material.NETHERITE_SHOVEL || material == Material.NETHERITE_HOE;
     }
 
+    /**
+     * @return True if the provided ItemStack's material is {@link Material#FISHING_ROD}
+     */
     static boolean FISHING_ROD(@NotNull ItemStack itemStack){
         return itemStack.getMaterial() == Material.FISHING_ROD;
     }
 
+    /**
+     * @return True if the provided ItemStack's material is {@link Material#TRIDENT}
+     */
     static boolean TRIDENT(@NotNull ItemStack itemStack){
         return itemStack.getMaterial() == Material.TRIDENT;
     }
 
-    static boolean BREAKABLE(@NotNull ItemStack itemStack){
-        return itemStack.getMaterial().registry().maxDamage() != 0;
-    }
-
+    /**
+     * @return True if the provided ItemStack's material is {@link Material#BOW}
+     */
     static boolean BOW(@NotNull ItemStack itemStack){
         return itemStack.getMaterial() == Material.BOW;
     }
 
+    /**
+     * @return True if the provided ItemStack's material is {@link Material#CROSSBOW}
+     */
+    static boolean CROSSBOW(@NotNull ItemStack itemStack){
+        return itemStack.getMaterial() == Material.CROSSBOW;
+    }
+
+
+    /**
+     * @return True if the provided ItemStack's material is armor or is one of the following materials:
+     * <ul>
+     *     <li>{@link Material#CARVED_PUMPKIN}</li>
+     *     <li>{@link Material#ELYTRA}</li>
+     *     <li>{@link Material#PLAYER_HEAD}</li>
+     *     <li>{@link Material#ZOMBIE_HEAD}</li>
+     *     <li>{@link Material#SKELETON_SKULL}</li>
+     *     <li>{@link Material#WITHER_SKELETON_SKULL}</li>
+     *     <li>{@link Material#CREEPER_HEAD}</li>
+     *     <li>{@link Material#DRAGON_HEAD}</li>
+     * </ul>
+     */
     static boolean WEARABLE(@NotNull ItemStack itemStack){
         Material material = itemStack.getMaterial();
         return material.isArmor() || material == Material.CARVED_PUMPKIN || material == Material.ELYTRA ||
@@ -71,10 +122,16 @@ public interface SlotType {
                 material == Material.WITHER_SKELETON_SKULL || material == Material.CREEPER_HEAD || material == Material.DRAGON_HEAD;
     }
 
-    static boolean CROSSBOW(@NotNull ItemStack itemStack){
-        return itemStack.getMaterial() == Material.CROSSBOW;
+    /**
+     * @return True if the provided ItemStack's material has durability
+     */
+    static boolean BREAKABLE(@NotNull ItemStack itemStack){
+        return itemStack.getMaterial().registry().maxDamage() != 0;
     }
 
+    /**
+     * @return True if the ItemStack's material is breakable or wearable
+     */
     static boolean ALL(@NotNull ItemStack itemStack){
         return BREAKABLE(itemStack) || WEARABLE(itemStack);
     }

@@ -52,7 +52,6 @@ public class EnchantmentManager {
         for (WeightedEnchant enchant : getEnchantsWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate)){
             enchantments.put(enchant.data().enchantment(), (short) enchant.level());
         }
-
         if (itemStack.getMeta() instanceof EnchantedBookMeta){
             return itemStack.withMeta(EnchantedBookMeta.class, builder -> builder.enchantments(enchantments));
         }
@@ -222,6 +221,12 @@ public class EnchantmentManager {
         }
     }
 
+    /**
+     * Associates the provided enchantment with the provided EnchantmentData in this instance's {@code EnchantmentData}
+     * map. If the map is currently null, it gets initialized.
+     * @param enchantment The key
+     * @param data The value
+     */
     public void putEnchantmentData(@NotNull Enchantment enchantment, @NotNull EnchantmentData data){
         if (this.data == null){
             this.initializeData();
@@ -229,6 +234,11 @@ public class EnchantmentManager {
         this.data.put(enchantment, data);
     }
 
+    /**
+     * Finds the EnchantmentData instance that is associated with the provided Enchantment.
+     * @param enchantment The enchantment to search
+     * @return The EnchantmentData
+     */
     public EnchantmentData getEnchantmentData(@NotNull Enchantment enchantment){
         if (this.data == null){
             if (useDefaultEnchantmentData){
@@ -239,6 +249,9 @@ public class EnchantmentManager {
         return this.data.get(enchantment);
     }
 
+    /**
+     * @return All values from this instance's EnchantmentData map.
+     */
     public @NotNull Collection<EnchantmentData> getAllEnchantmentData(){
         if (this.data == null){
             if (useDefaultEnchantmentData){
@@ -249,10 +262,17 @@ public class EnchantmentManager {
         return this.data.values();
     }
 
+    /**
+     * <p>Removes the provided enchantment from this EnchantmentManager.</p>
+     * <p>If the current map has been initialized, it attempts to remove the enchantment. Otherwise, if this instance
+     * uses the default enchantment data and the default enchantment data contains this key, it initializes this map and
+     * removes the value.</p>
+     * @param enchantment The enchantment to remove from this EnchantmentManager
+     */
     public void removeEnchantmentData(@NotNull Enchantment enchantment){
         if (this.data == null){
             // Don't initialize maps if there isn't a value to remove
-            if (this.useDefaultEnchantmentData && !EnchantmentData.getDefaultData().containsKey(enchantment)){
+            if (!this.useDefaultEnchantmentData || !EnchantmentData.getDefaultData().containsKey(enchantment)){
                 return;
             }
             this.initializeData();
@@ -260,6 +280,13 @@ public class EnchantmentManager {
         this.data.remove(enchantment);
     }
 
+    /**
+     * <p>Associates the key of {@code material} with the value that was provided. If the current map has not been
+     * initialized, it initializes it - except if this object should use the default enchantability data and the default
+     * enchantability table already has the provided enchantment associated with the provided value.</p>
+     * @param material The material to set
+     * @param value The value to associate with the material
+     */
     public void putEnchantability(@NotNull Material material, @NotNull Integer value){
         if (this.enchantability == null){
             // Don't initialize maps if the default is set to the provided value
@@ -271,6 +298,11 @@ public class EnchantmentManager {
         this.enchantability.put(material, value);
     }
 
+    /**
+     * <p>Attempts to get the enchantability for the provided material.</p>
+     * @param material The material to search for
+     * @return The enchantability value for the provided material.
+     */
     public Integer getEnchantability(@NotNull Material material){
         if (this.enchantability == null){
             if (useDefaultEnchantability){
@@ -281,6 +313,12 @@ public class EnchantmentManager {
         return this.enchantability.get(material);
     }
 
+    /**
+     * <p>Removes the provided material from this EnchantmentManager's enchantability map.</p>
+     * <p>If the current map has not been initialized yet, it initializes it - except if this object should use the
+     * default enchantability data and the default enchantability data does not contain that key.</p>
+     * @param material The material to remove
+     */
     public void removeEnchantability(@NotNull Material material){
         if (this.enchantability == null) {
             // Don't initialize maps if there isn't a value to remove
@@ -292,6 +330,9 @@ public class EnchantmentManager {
         this.enchantability.remove(material);
     }
 
+    /**
+     * Returns a new EnchantmentManager.Builder instance
+     */
     public static @NotNull Builder builder(){
         return new Builder();
     }
