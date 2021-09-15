@@ -99,10 +99,6 @@ public class EnchantmentManager {
         return itemStack.getMaterial() == Material.BOOK;
     }
 
-    public static void main(String[] args) {
-        System.out.println(EnchantmentManager.builder().build().enchantWithLevels(ItemStack.of(Material.DIAMOND_PICKAXE), 30, new Random(), EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook).getMeta().getEnchantmentMap());
-    }
-
     /**
      * <p>Adds the enchantments from {@link #getEnchantsWithLevels(ItemStack, int, Random, Predicate, Predicate)} to the provided
      * ItemStack. There's not really much to it, but it just converts the WeightedEnchants into a Map and then adds that to
