@@ -12,6 +12,10 @@ import java.util.function.Predicate;
 
 /**
  * <p>The EnchantmentManager class is meant to help you enchant items.</p>
+ * <p>Importantly, this is not an enchantment <b>table</b> or anvil library. It gives you convenient methods to enchant
+ * an item with a number of levels. This will not make enchantment tables automatically work, and the EnchantmentData
+ * classes aren't compatible with anything relating to anvils because they don't account for the fact that, for example,
+ * sharpness can be added to axes.</p>
  * <p>Each instance stores its own enchantability and EnchantmentData tables, so other extensions can't mess up yours
  * if you don't want them to.</p>
  * <p>You are completely free to modify the tables that this class has. If you have concurrency issues for some reason,
@@ -20,6 +24,30 @@ import java.util.function.Predicate;
  * case, this means that they do not get created until the user needs them. When you have the {@code useDefaultEnchantmentData}
  * or {@code useDefaultEnchantability} settings enabled and the map for it has not been initialized, it will grab the
  * data from the default map instead of creating a new one.</p>
+ * <br>
+ * <h3>Guide to implementing default Minecraft enchanting</h3>
+ * Obviously, you have to create a new {@code EnchantmentManager} instance via the builder. You can set {@code useConcurrentHashMap}
+ * to whatever you want, but keep the other settings as the default.<br>
+ * Run {@link EnchantmentManager#enchantWithLevels(ItemStack, int, Random, Predicate, Predicate)
+ * manager.enchantWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate} where:
+ * <ul>
+ *     <li>{@code manager} is the EnchantmentManager that you created</li>
+ *     <li>{@code itemStack} is the ItemStack that you want enchanted</li>
+ *     <li>{@code levels} is the number of levels that you want to enchant the item with</li>
+ *     <li>{@code random} is the Random instance that the code should use</li>
+ *     <li>{@code enchantmentPredicate} is the predicate that determines if an enchantment should be considered</li>
+ *     <li>{@code alwaysAddPredicate} is the predicate that determines if slot types should be ignored</li>
+ * </ul>
+ * Now, if you want default behavior, you'd want to put {@link EnchantmentManager#alwaysAddIfBook(ItemStack)} as the
+ * {@code alwaysAddPredicate} argument, since it mimics default behavior. Note that, if you use this, you probably will
+ * want to manually change {@link Material#BOOK}s to {@link Material#ENCHANTED_BOOK}s if they get enchanted.<br>
+ * For {@code enchantmentPredicate}, you'll want to put {@link EnchantmentManager#discoverable(EnchantmentData)} if you
+ * want to allow treasure enchantments and {@link EnchantmentManager#discoverableAndNotTreasure(EnchantmentData)} if you
+ * don't.<br>
+ * I don't have to tell you how to use the remaining arguments :)<br><br>
+ * Here is some correct but extremely unorthodox code so you can see an example. <b>Please</b> do not directly copy
+ * paste it because that will cause me great pain.<br>
+ * <code>EnchantmentManager.builder().build().enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(), EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook)</code>
  */
 public class EnchantmentManager {
     // Store builder and initialize data as null so we can lazily initialize values
@@ -31,6 +59,48 @@ public class EnchantmentManager {
         this.useConcurrentHashMap = builder.useConcurrentHashMap;
         this.useDefaultEnchantmentData = builder.useDefaultEnchantmentData;
         this.useDefaultEnchantability = builder.useDefaultEnchantability;
+    }
+
+    /**
+     * <p>This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this
+     * class (with the name "enchantmentPredicate").</p>
+     * <p>In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
+     * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.</p>
+     * <p>This predicate acts identically to if you want to enchant an item and accept both treasure and non-treasure
+     * enchantments. For example, this is the method you'd use if you wanted to enchant the items in end city chests.</p>
+     */
+    public static boolean discoverable(@NotNull EnchantmentData data){
+        return data.enchantment().registry().isDiscoverable();
+    }
+
+    /**
+     * <p>This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this
+     * class (with the name "enchantmentPredicate").</p>
+     * <p>In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
+     * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.</p>
+     * <p>This predicate acts identically to if you want to enchant an item and accept only non-treasure enchantments.
+     * For example, this is the method you'd use if you wanted to enchant an item at an enchantment table.</p>
+     */
+    public static boolean discoverableAndNotTreasure(@NotNull EnchantmentData data){
+        return data.enchantment().registry().isDiscoverable() && !data.enchantment().registry().isTreasureOnly();
+    }
+
+    /**
+     * <p>This is meant to act as an argument when you need to pass a Predicate<ItemStack> into methods of this
+     * class (with the name "alwaysAddPredicate").</p>
+     * <p>In default Minecraft, enchantments can only be added to items if the enchantment's slot type applies to the
+     * item - except if the item is a book. If it's a book, all enchantments will work, and it will be converted to an
+     * enchanted book. Since this isn't default Minecraft, you'll have to convert it to an enchanted book yourself if
+     * you want it to be.</p>
+     * <p>Basically, this is the default predicate that would be used anywhere in default Minecraft if you wanted to
+     * enchant something.</p>
+     */
+    public static boolean alwaysAddIfBook(@NotNull ItemStack itemStack){
+        return itemStack.getMaterial() == Material.BOOK;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(EnchantmentManager.builder().build().enchantWithLevels(ItemStack.of(Material.DIAMOND_PICKAXE), 30, new Random(), EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook).getMeta().getEnchantmentMap());
     }
 
     /**
