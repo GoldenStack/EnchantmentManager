@@ -3,8 +3,10 @@ package dev.goldenstack.enchantment;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,11 +18,11 @@ import java.util.function.Predicate;
  * item with a number of levels. This will not make enchantment tables automatically work, and the EnchantmentData
  * classes aren't compatible with anything relating to anvils because they don't account for the fact that, for example,
  * sharpness can be added to axes.<br>
- * Each instance stores its own enchantability and EnchantmentData tables, so other extensions can't mess up yours if
- * you don't want them to.<br>
+ * Each instance stores its own enchantability and EnchantmentData maps, so other extensions can't mess up yours if you
+ * don't want them to.<br>
  * You are completely free to modify the tables that this class has. If you have concurrency issues for some reason,
  * consider enabling the {@link EnchantmentManager.Builder#useConcurrentHashMap(boolean)} setting.<br>
- * EnchantmentManager instances have their EnchantmentData and enchantability tables lazily initialized. In this case,
+ * EnchantmentManager instances have their EnchantmentData and enchantability maps lazily initialized. In this case,
  * this means that they do not get created until the user needs them. When you have the
  * {@code useDefaultEnchantmentData} or {@code useDefaultEnchantability} settings enabled and the map for it has not
  * been initialized, it will grab the data from the default map instead of creating a new one.<br>
@@ -53,7 +55,7 @@ import java.util.function.Predicate;
 public class EnchantmentManager {
 
     // Store builder and initialize data as null so we can lazily initialize values
-    private Map<Enchantment, EnchantmentData> data = null;
+    private Map<NamespaceID, EnchantmentData> data = null;
     private Map<Material, Integer> enchantability = null;
 
     private final boolean useConcurrentHashMap, useDefaultEnchantmentData, useDefaultEnchantability;
@@ -194,7 +196,7 @@ public class EnchantmentManager {
         enchants.add(first);
 
         // Note that there is always a chance of this returning true, resulting in the very small chance of
-        // getting an almost completely maxed sword as long as you have a high enough level.
+        // getting an almost completely maxed item as long as you have a high enough level.
         while(random.nextInt(50) <= levels){
             WeightedEnchant last = enchants.get(enchants.size() - 1);
             Iterator<WeightedEnchant> iterator = list.iterator();
@@ -285,36 +287,36 @@ public class EnchantmentManager {
     }
 
     /**
-     * Associates the enchantment with the provided EnchantmentData.
-     * @param enchantment The key
+     * Associates the key with the provided EnchantmentData.
+     * @param key The key
      * @param data The value
      */
-    public void putEnchantmentData(@NotNull Enchantment enchantment, @NotNull EnchantmentData data){
+    public void putEnchantmentData(@NotNull NamespaceID key, @NotNull EnchantmentData data){
         if (this.data == null){
             this.initializeData();
         }
-        this.data.put(enchantment, data);
+        this.data.put(key, data);
     }
 
     /**
-     * Finds the EnchantmentData instance that is associated with the provided Enchantment.
-     * @param enchantment The enchantment to search
+     * Finds the EnchantmentData instance that is associated with the provided key.
+     * @param key The key to search
      * @return The data
      */
-    public EnchantmentData getEnchantmentData(@NotNull Enchantment enchantment){
+    public @Nullable EnchantmentData getEnchantmentData(@NotNull NamespaceID key){
         if (this.data == null){
             if (useDefaultEnchantmentData){
-                return EnchantmentData.getDefaultData().get(enchantment);
+                return EnchantmentData.getDefaultData().get(key);
             }
             return null;
         }
-        return this.data.get(enchantment);
+        return this.data.get(key);
     }
 
     /**
      * @return A collection of all the keys from this instance's EnchantmentData map.
      */
-    public @NotNull Collection<Enchantment> getAllEnchantments(){
+    public @NotNull Collection<NamespaceID> getAllKeys(){
         if (this.data == null){
             if (useDefaultEnchantmentData){
                 return Collections.unmodifiableCollection(EnchantmentData.getDefaultData().keySet());
@@ -338,18 +340,18 @@ public class EnchantmentManager {
     }
 
     /**
-     * Removes the provided enchantment from this manager.
-     * @param enchantment The enchantment to remove
+     * Removes the provided key from this manager.
+     * @param key The key to remove
      */
-    public void removeEnchantmentData(@NotNull Enchantment enchantment){
+    public void removeEnchantmentData(@NotNull NamespaceID key){
         if (this.data == null){
             // Don't initialize maps if there isn't a value to remove
-            if (!this.useDefaultEnchantmentData || !EnchantmentData.getDefaultData().containsKey(enchantment)){
+            if (!this.useDefaultEnchantmentData || !EnchantmentData.getDefaultData().containsKey(key)){
                 return;
             }
             this.initializeData();
         }
-        this.data.remove(enchantment);
+        this.data.remove(key);
     }
 
     /**
@@ -373,7 +375,7 @@ public class EnchantmentManager {
      * @param material The material to search for
      * @return The enchantability value for the provided material
      */
-    public Integer getEnchantability(@NotNull Material material){
+    public @Nullable Integer getEnchantability(@NotNull Material material){
         if (this.enchantability == null){
             if (useDefaultEnchantability){
                 return EnchantmentData.getDefaultEnchantability().get(material);
