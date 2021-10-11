@@ -11,23 +11,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 /**
- * <p>The EnchantmentManager class is meant to help you enchant items.</p>
- * <p>Importantly, this is not an enchantment <b>table</b> or anvil library. It gives you convenient methods to enchant
- * an item with a number of levels. This will not make enchantment tables automatically work, and the EnchantmentData
+ * The EnchantmentManager class is meant to help you enchant items.<br>
+ * Importantly, this is not an enchantment <b>table</b> or anvil library. It gives you convenient methods to enchant an
+ * item with a number of levels. This will not make enchantment tables automatically work, and the EnchantmentData
  * classes aren't compatible with anything relating to anvils because they don't account for the fact that, for example,
- * sharpness can be added to axes.</p>
- * <p>Each instance stores its own enchantability and EnchantmentData tables, so other extensions can't mess up yours
- * if you don't want them to.</p>
- * <p>You are completely free to modify the tables that this class has. If you have concurrency issues for some reason,
- * consider enabling the {@link EnchantmentManager.Builder#useConcurrentHashMap(boolean)} setting.</p>
- * <p>EnchantmentManager instances have their EnchantmentData and enchantability tables lazily initialized. In this
- * case, this means that they do not get created until the user needs them. When you have the {@code useDefaultEnchantmentData}
- * or {@code useDefaultEnchantability} settings enabled and the map for it has not been initialized, it will grab the
- * data from the default map instead of creating a new one.</p>
+ * sharpness can be added to axes.<br>
+ * Each instance stores its own enchantability and EnchantmentData tables, so other extensions can't mess up yours if
+ * you don't want them to.<br>
+ * You are completely free to modify the tables that this class has. If you have concurrency issues for some reason,
+ * consider enabling the {@link EnchantmentManager.Builder#useConcurrentHashMap(boolean)} setting.<br>
+ * EnchantmentManager instances have their EnchantmentData and enchantability tables lazily initialized. In this case,
+ * this means that they do not get created until the user needs them. When you have the
+ * {@code useDefaultEnchantmentData} or {@code useDefaultEnchantability} settings enabled and the map for it has not
+ * been initialized, it will grab the data from the default map instead of creating a new one.<br>
  * <br>
  * <h3>Guide to implementing default Minecraft enchanting</h3>
- * Obviously, you have to create a new {@code EnchantmentManager} instance via the builder. You can set {@code useConcurrentHashMap}
- * to whatever you want, but keep the other settings as the default.<br>
+ * Obviously, you have to create a new {@code EnchantmentManager} instance via the builder. You can set {@code
+ * useConcurrentHashMap} to whatever you want, but keep the other settings as the default.<br>
  * Run {@link EnchantmentManager#enchantWithLevels(ItemStack, int, Random, Predicate, Predicate)
  * manager.enchantWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate} where:
  * <ul>
@@ -44,17 +44,20 @@ import java.util.function.Predicate;
  * For {@code enchantmentPredicate}, you'll want to put {@link EnchantmentManager#discoverable(EnchantmentData)} if you
  * want to allow treasure enchantments and {@link EnchantmentManager#discoverableAndNotTreasure(EnchantmentData)} if you
  * don't.<br>
- * I don't have to tell you how to use the remaining arguments :)<br><br>
- * Here is some correct but extremely unorthodox code so you can see an example. <b>Please</b> do not directly copy
- * paste it because that will cause me great pain.<br>
- * <code>EnchantmentManager.builder().build().enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(), EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook)</code>
+ * <br>
+ * Here is some correct but extremely unorthodox code so you can see an example. Since this is just example code, it's
+ * not a good idea to actually use this example for anything.<br>
+ * <code>EnchantmentManager.builder().build().enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(),
+ * EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook)</code>
  */
 public class EnchantmentManager {
+
     // Store builder and initialize data as null so we can lazily initialize values
     private Map<Enchantment, EnchantmentData> data = null;
     private Map<Material, Integer> enchantability = null;
 
     private final boolean useConcurrentHashMap, useDefaultEnchantmentData, useDefaultEnchantability;
+
     private EnchantmentManager(@NotNull EnchantmentManager.Builder builder){
         this.useConcurrentHashMap = builder.useConcurrentHashMap;
         this.useDefaultEnchantmentData = builder.useDefaultEnchantmentData;
@@ -62,48 +65,49 @@ public class EnchantmentManager {
     }
 
     /**
-     * <p>This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this
-     * class (with the name "enchantmentPredicate").</p>
-     * <p>In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
-     * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.</p>
-     * <p>This predicate acts identically to if you want to enchant an item and accept both treasure and non-treasure
-     * enchantments. For example, this is the method you'd use if you wanted to enchant the items in end city chests.</p>
+     * This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this class
+     * (with the name "enchantmentPredicate").<br>
+     * In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
+     * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.<br>
+     * This predicate acts identically to if you want to enchant an item and accept both treasure and non-treasure
+     * enchantments. For example, this is the method you'd use if you wanted to enchant the items in end city chests.
      */
     public static boolean discoverable(@NotNull EnchantmentData data){
         return data.enchantment().registry().isDiscoverable();
     }
 
     /**
-     * <p>This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this
-     * class (with the name "enchantmentPredicate").</p>
-     * <p>In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
-     * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.</p>
-     * <p>This predicate acts identically to if you want to enchant an item and accept only non-treasure enchantments.
-     * For example, this is the method you'd use if you wanted to enchant an item at an enchantment table.</p>
+     * This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this class
+     * (with the name "enchantmentPredicate").<br>
+     * In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
+     * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.<br>
+     * This predicate acts identically to if you want to enchant an item and accept only non-treasure enchantments. For
+     * example, this is the method you'd use if you wanted to enchant an item at an enchantment table.
      */
     public static boolean discoverableAndNotTreasure(@NotNull EnchantmentData data){
         return data.enchantment().registry().isDiscoverable() && !data.enchantment().registry().isTreasureOnly();
     }
 
     /**
-     * <p>This is meant to act as an argument when you need to pass a Predicate<ItemStack> into methods of this
-     * class (with the name "alwaysAddPredicate").</p>
-     * <p>In default Minecraft, enchantments can only be added to items if the enchantment's slot type applies to the
-     * item - except if the item is a book. If it's a book, all enchantments will work, and it will be converted to an
+     * This is meant to act as an argument when you need to pass a Predicate<ItemStack> into methods of this class (with
+     * the name "alwaysAddPredicate").<br>
+     * In default Minecraft, enchantments can only be added to items if the enchantment's slot type applies to the item
+     * - except if the item is a book. If it's a book, all enchantments will work, and it will be converted to an
      * enchanted book. Since this isn't default Minecraft, you'll have to convert it to an enchanted book yourself if
-     * you want it to be.</p>
-     * <p>Basically, this is the default predicate that would be used anywhere in default Minecraft if you wanted to
-     * enchant something.</p>
+     * you want it to be.<br>
+     * Basically, this is the default predicate that would be used anywhere in default Minecraft if you wanted to
+     * enchant something.
      */
     public static boolean alwaysAddIfBook(@NotNull ItemStack itemStack){
         return itemStack.getMaterial() == Material.BOOK;
     }
 
     /**
-     * <p>Adds the enchantments from {@link #getEnchantsWithLevels(ItemStack, int, Random, Predicate, Predicate)} to the provided
-     * ItemStack. There's not really much to it, but it just converts the WeightedEnchants into a Map and then adds that to
-     * the ItemStack.</p>
-     * <b><p>For parameter information, please check the documentation of {@link #getEnchantsWithLevels(ItemStack, int, Random, Predicate, Predicate)}</p></b>
+     * Adds the enchantments from {@link #getEnchantsWithLevels(ItemStack, int, Random, Predicate, Predicate)} to the
+     * provided ItemStack. There's not really much to it, but it just converts the WeightedEnchants into a Map and then
+     * adds that to the ItemStack.<br>
+     * <b>For parameter information, please check the documentation of {@link #getEnchantsWithLevels(ItemStack, int,
+     * Random, Predicate, Predicate)}</b><br>
      * @return The enchanted ItemStack
      */
     public @NotNull ItemStack enchantWithLevels(@NotNull ItemStack itemStack, int levels, @NotNull Random random,
@@ -124,17 +128,17 @@ public class EnchantmentManager {
      *     easily be manipulated.</li>
      *     <li>For each 4 enchantability points (rounded down), 0 to 2 extra levels are added to the calculation.</li>
      *     <li>Additionally, 0 to 2 levels are added regardless of the item's
-     *     enchantability. </li>
+     *     enchantability.</li>
      *     <li>The current level is then multiplied by a random number from 0.85 to 1.15, and then rounded
      *     to the nearest integer.</li>
      * </ul>
-     * <p>After the manipulations to the level count, the enchantments must be randomly picked from the list of
+     * After the manipulations to the level count, the enchantments must be randomly picked from the list of
      * enchantments retrieved from {@link #getWeightedEnchantments(ItemStack, int, Predicate, Predicate)}. Importantly,
-     * one enchantment is always picked from the list of possible enchantments (unless the list is empty).</p>
-     * <p>All the code in the following list is under a {@code while} loop.</p>
+     * one enchantment is always picked from the list of possible enchantments (unless the list is empty).<br>
+     * All the code in the following list is under a {@code while} loop.<br>
      * <ul>
      *     <li>There is a {@code levels / 50} probability that the loop decides to pick an enchantment. However, if the
-     *     chance would be 0/50, it is 1/50 instead./li>
+     *     chance would be 0/50, it is 1/50 instead.</li>
      *     <li>First, the most recently added enchantment gets all of its colliding enchantments removed from the list
      *     of possible enchantments. Since this is done before any other calculations, on the {@code while} loop's first
      *     iteration, it covers the collisions of the enchantment that was added before the loop started.</li>
@@ -162,7 +166,8 @@ public class EnchantmentManager {
                                                                 @NotNull Predicate<EnchantmentData> enchantmentPredicate,
                                                                 @NotNull Predicate<ItemStack> alwaysAddPredicate) {
         List<WeightedEnchant> enchants = new ArrayList<>();
-        int enchantability = getEnchantability(itemStack.getMaterial());
+        Integer value = getEnchantability(itemStack.getMaterial());
+        int enchantability = value == null ? 0 : value;
 
         // Simplified version of the (official) code: levels += 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
         levels += 1 + random.nextInt((enchantability / 4) * 2 + 2);
@@ -214,9 +219,9 @@ public class EnchantmentManager {
     }
 
     /**
-     * <p>Generates a list of possible enchantments that could be applied to the given item.</p>
-     * <p>The process is relatively simple. For each enchantment that is registered in this instance's {@code EnchantmentData}
-     * map:</p>
+     * Generates a list of possible enchantments that could be applied to the given item.<br>
+     *  The process is relatively simple. For each enchantment that is registered in this instance's {@code EnchantmentData}
+     * map:<br>
      * <ul>
      *     <li>If the enchantment does not pass the {@code enchantmentPredicate} predicate, it will skip to the next
      *     one.</li>
@@ -280,8 +285,7 @@ public class EnchantmentManager {
     }
 
     /**
-     * Associates the provided enchantment with the provided EnchantmentData in this instance's {@code EnchantmentData}
-     * map. If the map is currently null, it gets initialized.
+     * Associates the enchantment with the provided EnchantmentData.
      * @param enchantment The key
      * @param data The value
      */
@@ -295,7 +299,7 @@ public class EnchantmentManager {
     /**
      * Finds the EnchantmentData instance that is associated with the provided Enchantment.
      * @param enchantment The enchantment to search
-     * @return The EnchantmentData
+     * @return The data
      */
     public EnchantmentData getEnchantmentData(@NotNull Enchantment enchantment){
         if (this.data == null){
@@ -308,24 +312,34 @@ public class EnchantmentManager {
     }
 
     /**
-     * @return All values from this instance's EnchantmentData map.
+     * @return A collection of all the keys from this instance's EnchantmentData map.
+     */
+    public @NotNull Collection<Enchantment> getAllEnchantments(){
+        if (this.data == null){
+            if (useDefaultEnchantmentData){
+                return Collections.unmodifiableCollection(EnchantmentData.getDefaultData().keySet());
+            }
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableCollection(this.data.keySet());
+    }
+
+    /**
+     * @return A collection of all the values from this instance's EnchantmentData map.
      */
     public @NotNull Collection<EnchantmentData> getAllEnchantmentData(){
         if (this.data == null){
             if (useDefaultEnchantmentData){
-                return EnchantmentData.getDefaultData().values();
+                return Collections.unmodifiableCollection(EnchantmentData.getDefaultData().values());
             }
             return Collections.emptyList();
         }
-        return this.data.values();
+        return Collections.unmodifiableCollection(this.data.values());
     }
 
     /**
-     * <p>Removes the provided enchantment from this EnchantmentManager.</p>
-     * <p>If the current map has been initialized, it attempts to remove the enchantment. Otherwise, if this instance
-     * uses the default enchantment data and the default enchantment data contains this key, it initializes this map and
-     * removes the value.</p>
-     * @param enchantment The enchantment to remove from this EnchantmentManager
+     * Removes the provided enchantment from this manager.
+     * @param enchantment The enchantment to remove
      */
     public void removeEnchantmentData(@NotNull Enchantment enchantment){
         if (this.data == null){
@@ -339,9 +353,7 @@ public class EnchantmentManager {
     }
 
     /**
-     * <p>Associates the key of {@code material} with the value that was provided. If the current map has not been
-     * initialized, it initializes it - except if this object should use the default enchantability data and the default
-     * enchantability table already has the provided enchantment associated with the provided value.</p>
+     * Associates the provided material with the value.
      * @param material The material to set
      * @param value The value to associate with the material
      */
@@ -357,9 +369,9 @@ public class EnchantmentManager {
     }
 
     /**
-     * <p>Attempts to get the enchantability for the provided material.</p>
+     * Attempts to get the enchantability for the provided material.
      * @param material The material to search for
-     * @return The enchantability value for the provided material.
+     * @return The enchantability value for the provided material
      */
     public Integer getEnchantability(@NotNull Material material){
         if (this.enchantability == null){
@@ -372,9 +384,7 @@ public class EnchantmentManager {
     }
 
     /**
-     * <p>Removes the provided material from this EnchantmentManager's enchantability map.</p>
-     * <p>If the current map has not been initialized yet, it initializes it - except if this object should use the
-     * default enchantability data and the default enchantability data does not contain that key.</p>
+     * Removes the provided material from this manager's enchantability map.
      * @param material The material to remove
      */
     public void removeEnchantability(@NotNull Material material){
@@ -406,9 +416,9 @@ public class EnchantmentManager {
         private Builder(){}
 
         /**
-         * <p>When true, sets the {@code data} and {@code enchantability} maps to ConcurrentHashMaps when they
-         * get initialized instead of normal HashMaps.</p>
-         * <p>Default: {@code false}</p>
+         * When true, makes all instances created with this builder use concurrent hash maps instead of normal hash
+         * maps.<br>
+         * Default: {@code false}<
          */
         @Contract("_ -> this")
         public @NotNull Builder useConcurrentHashMap(boolean useConcurrentHashMap) {
@@ -417,9 +427,9 @@ public class EnchantmentManager {
         }
 
         /**
-         * <p>When true, makes the built EnchantmentManager automatically add the default enchantment data from
-         * {@link EnchantmentData#getDefaultData()} when the {@code data} map gets initialized.</p>
-         * <p>Default: {@code true}</p>
+         * When true, automatically adds the default enchantment data from {@link EnchantmentData#getDefaultData()} to
+         * any EnchantmentManager instances that are created from this instance.<br>
+         * Default: {@code true}
          */
         @Contract("_ -> this")
         public @NotNull Builder useDefaultEnchantmentData(boolean useDefaultEnchantmentData) {
@@ -428,9 +438,9 @@ public class EnchantmentManager {
         }
 
         /**
-         * When true, makes the built EnchantmentManager automatically add the default enchantability data from
-         * {@link EnchantmentData#getDefaultEnchantability()} when the {@code enchantability} map gets initialized.
-         * <p>Default: {@code true}</p>
+         * When true, automatically adds the default enchantability values from {@link EnchantmentData#getDefaultEnchantability()}
+         * to any EnchantmentManager instances that are created from this builder.<br>
+         * Default: {@code true}
          */
         @Contract("_ -> this")
         public @NotNull Builder useDefaultEnchantability(boolean useDefaultEnchantability) {
@@ -439,7 +449,8 @@ public class EnchantmentManager {
         }
 
         /**
-         * Turns this builder into an EnchantmentManager
+         * Creates a new EnchantmentManager from this builder. This is theoretically safe to run multiple times from the
+         * same builder.
          */
         public @NotNull EnchantmentManager build(){
             return new EnchantmentManager(this);

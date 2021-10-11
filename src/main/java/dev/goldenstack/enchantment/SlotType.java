@@ -6,10 +6,11 @@ import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * <p>Represents the slot type of an enchantment.</p>
- * <p>All the slot types in default Minecraft are defined here, but you are free to use your own!</p>
+ * Represents the slot type of an enchantment.<br>
+ * All the slot types in default Minecraft are defined here, but you are free to use your own!
  */
 public interface SlotType {
+
     /**
      * @return True if the SlotType can accept the provided ItemStack, otherwise false
      */
@@ -65,12 +66,12 @@ public interface SlotType {
      */
     static boolean TOOL(@NotNull ItemStack itemStack){
         Material material = itemStack.getMaterial();
-        return  material == Material.WOODEN_PICKAXE || material == Material.WOODEN_AXE || material == Material.WOODEN_SHOVEL || material == Material.WOODEN_HOE ||
-                material == Material.STONE_PICKAXE || material == Material.STONE_AXE || material == Material.STONE_SHOVEL || material == Material.STONE_HOE ||
-                material == Material.IRON_PICKAXE || material == Material.IRON_AXE || material == Material.IRON_SHOVEL || material == Material.IRON_HOE ||
-                material == Material.GOLDEN_PICKAXE || material == Material.GOLDEN_AXE || material == Material.GOLDEN_SHOVEL || material == Material.GOLDEN_HOE ||
-                material == Material.DIAMOND_PICKAXE || material == Material.DIAMOND_AXE || material == Material.DIAMOND_SHOVEL || material == Material.DIAMOND_HOE ||
-                material == Material.NETHERITE_PICKAXE || material == Material.NETHERITE_AXE || material == Material.NETHERITE_SHOVEL || material == Material.NETHERITE_HOE;
+        return material == Material.WOODEN_PICKAXE || material == Material.WOODEN_AXE || material == Material.WOODEN_SHOVEL || material == Material.WOODEN_HOE ||
+               material == Material.STONE_PICKAXE || material == Material.STONE_AXE || material == Material.STONE_SHOVEL || material == Material.STONE_HOE ||
+               material == Material.IRON_PICKAXE || material == Material.IRON_AXE || material == Material.IRON_SHOVEL || material == Material.IRON_HOE ||
+               material == Material.GOLDEN_PICKAXE || material == Material.GOLDEN_AXE || material == Material.GOLDEN_SHOVEL || material == Material.GOLDEN_HOE ||
+               material == Material.DIAMOND_PICKAXE || material == Material.DIAMOND_AXE || material == Material.DIAMOND_SHOVEL || material == Material.DIAMOND_HOE ||
+               material == Material.NETHERITE_PICKAXE || material == Material.NETHERITE_AXE || material == Material.NETHERITE_SHOVEL || material == Material.NETHERITE_HOE;
     }
 
     /**
