@@ -7,7 +7,6 @@ import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
-import java.util.Objects;
 
 import static dev.goldenstack.enchantment.LevelProvider.*;
 
@@ -15,76 +14,32 @@ import static dev.goldenstack.enchantment.LevelProvider.*;
  * Represents extra data about an enchantment. This data is only carried in this object, so different
  * {@code EnchantmentManager}s could have completely different values for the same enchantment.
  */
-public class EnchantmentData {
-
-    private final @NotNull Enchantment enchantment;
-    private final int weight;
-    private final @NotNull SlotType slotType;
-    private final @NotNull LevelProvider minLP, maxLP;
-    private final @NotNull ImmutableList<Enchantment> incompatible;
-
-    /**
-     * Creates a new EnchantmentData instance with all the values directly set
-     */
-    public EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
-                           @NotNull LevelProvider minLP, @NotNull LevelProvider maxLP, @NotNull ImmutableList<Enchantment> incompatible){
-        this.enchantment = enchantment;
-        this.weight = weight;
-        this.slotType = slotType;
-        this.maxLP = maxLP;
-        this.minLP = minLP;
-        this.incompatible = incompatible;
-    }
+public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
+                              @NotNull LevelProvider minimumLevelProvider, @NotNull LevelProvider maximumLevelProvider,
+                              @NotNull ImmutableList<Enchantment> incompatible){
 
     /**
      * Creates a new EnchantmentData instance with all the values directly set - except for {@code incompatible}, which
      * is converted into an ImmutableList.
      */
     public EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
-                           @NotNull LevelProvider minLP, @NotNull LevelProvider maxLP, @NotNull Enchantment @NotNull ... incompatible){
-        this(enchantment, weight, slotType, minLP, maxLP, ImmutableList.copyOf(incompatible));
+                           @NotNull LevelProvider minimumLevelProvider, @NotNull LevelProvider maximumLevelProvider,
+                           @NotNull Enchantment @NotNull ... incompatible){
+        this(enchantment, weight, slotType, minimumLevelProvider, maximumLevelProvider, ImmutableList.copyOf(incompatible));
     }
 
     /**
-     * @return The enchantment that this instance represents
-     */
-    public @NotNull Enchantment enchantment(){
-        return enchantment;
-    }
-
-    /**
-     * @return The weight of the enchantment
-     */
-    public int weight(){
-        return weight;
-    }
-
-    /**
-     * @return The type of slot that the enchantment can be on
-     */
-    public @NotNull SlotType slotType(){
-        return slotType;
-    }
-
-    /**
-     * @return The immutable list of incompatible enchantments
-     */
-    public @NotNull ImmutableList<Enchantment> incompatible(){
-        return incompatible;
-    }
-
-    /**
-     * Gets the minimum level for the provided enchantment level according to {@link #minLP}.
+     * Gets the minimum level for the provided enchantment level according to {@link #minimumLevelProvider}.
      */
     public int getMinimumLevel(int level){
-        return this.minLP.getLevel(this, level);
+        return this.minimumLevelProvider.getLevel(this, level);
     }
 
     /**
-     * Gets the maximum level for the provided enchantment level according to {@link #maxLP}.
+     * Gets the maximum level for the provided enchantment level according to {@link #maximumLevelProvider}.
      */
     public int getMaximumLevel(int level){
-        return this.maxLP.getLevel(this, level);
+        return this.maximumLevelProvider.getLevel(this, level);
     }
 
     /**
@@ -117,25 +72,6 @@ public class EnchantmentData {
             }
         }
         return false;
-    }
-
-    public @NotNull String toString(){
-        return "EnchantmentData[enchantment=" + enchantment + ", weight=" + weight + ", slotType=" + slotType +
-                ", incompatible=" + this.incompatible + "]";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        EnchantmentData that = (EnchantmentData) o;
-        return weight == that.weight && enchantment.equals(that.enchantment) && slotType.equals(that.slotType)
-                && minLP.equals(that.minLP) && maxLP.equals(that.maxLP) && this.incompatible.equals(that.incompatible);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(enchantment, weight, slotType, minLP, maxLP, incompatible);
     }
 
     /**

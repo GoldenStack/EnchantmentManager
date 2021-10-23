@@ -12,33 +12,7 @@ import java.util.List;
  * with this class directly.
  */
 @ApiStatus.Internal
-class WeightedEnchant implements WeightedRandomItem {
-    private final @NotNull EnchantmentData data;
-    private final int level;
-
-    public WeightedEnchant(@NotNull EnchantmentData data, int level){
-        this.data = data;
-        this.level = level;
-    }
-
-    /**
-     * @return This instance's data
-     */
-    public @NotNull EnchantmentData data(){
-        return data;
-    }
-
-    /**
-     * @return The level of the enchantment
-     */
-    public int level(){
-        return level;
-    }
-
-    @Override
-    public String toString() {
-        return "WeightedEnchant[data=" + data + ", level=" + level + "]";
-    }
+record WeightedEnchant(@NotNull EnchantmentData data, int level) implements WeightedRandomItem {
 
     /**
      * @return This data's weight
@@ -55,10 +29,10 @@ class WeightedEnchant implements WeightedRandomItem {
      * @param value The value
      * @return The item that was selected, or null if the value was too large.
      */
-    public static <T extends WeightedRandomItem> @Nullable T getWeightedItemFrom(@NotNull List<T> list, double value){
-        for (T item : list){
+    public static <T extends WeightedRandomItem> @Nullable T getWeightedItemFrom(@NotNull List<T> list, double value) {
+        for (T item : list) {
             value -= item.getWeight();
-            if (value < 0){
+            if (value < 0) {
                 return item;
             }
         }
