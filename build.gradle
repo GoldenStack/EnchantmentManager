@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
 }
 
@@ -16,6 +16,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Minestom:Minestom:-SNAPSHOT'
-    implementation 'org.jetbrains:annotations:22.0.0'
+    api 'com.github.Minestom:Minestom:-SNAPSHOT'
+    api 'org.jetbrains:annotations:22.0.0'
 }
