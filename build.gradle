@@ -19,3 +19,5 @@ dependencies {
     api 'com.github.Minestom:Minestom:-SNAPSHOT'
     api 'org.jetbrains:annotations:22.0.0'
 }
+
+publishToMavenLocal.enabled = false
