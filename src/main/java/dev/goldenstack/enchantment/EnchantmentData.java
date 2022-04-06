@@ -1,11 +1,11 @@
 package dev.goldenstack.enchantment;
 
-import com.google.common.collect.ImmutableList;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.Material;
 import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 
 import static dev.goldenstack.enchantment.LevelProvider.*;
@@ -16,7 +16,7 @@ import static dev.goldenstack.enchantment.LevelProvider.*;
  */
 public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
                               @NotNull LevelProvider minimumLevelProvider, @NotNull LevelProvider maximumLevelProvider,
-                              @NotNull ImmutableList<Enchantment> incompatible){
+                              @NotNull List<Enchantment> incompatible) {
 
     /**
      * Creates a new EnchantmentData instance with all the values directly set - except for {@code incompatible}, which
@@ -24,21 +24,21 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
      */
     public EnchantmentData(@NotNull Enchantment enchantment, int weight, @NotNull SlotType slotType,
                            @NotNull LevelProvider minimumLevelProvider, @NotNull LevelProvider maximumLevelProvider,
-                           @NotNull Enchantment @NotNull ... incompatible){
-        this(enchantment, weight, slotType, minimumLevelProvider, maximumLevelProvider, ImmutableList.copyOf(incompatible));
+                           @NotNull Enchantment @NotNull ... incompatible) {
+        this(enchantment, weight, slotType, minimumLevelProvider, maximumLevelProvider, List.of(incompatible));
     }
 
     /**
-     * Gets the minimum level for the provided enchantment level according to {@link #minimumLevelProvider}.
+     * @return the minimum level for the provided enchantment level according to {@link #minimumLevelProvider}.
      */
-    public int getMinimumLevel(int level){
+    public int getMinimumLevel(int level) {
         return this.minimumLevelProvider.getLevel(this, level);
     }
 
     /**
-     * Gets the maximum level for the provided enchantment level according to {@link #maximumLevelProvider}.
+     * @return the maximum level for the provided enchantment level according to {@link #maximumLevelProvider}.
      */
-    public int getMaximumLevel(int level){
+    public int getMaximumLevel(int level) {
         return this.maximumLevelProvider.getLevel(this, level);
     }
 
@@ -50,41 +50,25 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
      *     <li>The enchantment is contained on the other object's list of incompatible enchantments</li>
      *     <li>or the other object's enchantment is contained on this object's list of incompatible enchantments.</li>
      * </ul>
+     *
      * @param data The other EnchantmentData
-     * @return If this object's enchantment collides with the other's enchantment
+     * @return if this object's enchantment collides with the other's enchantment
      */
-    public boolean collidesWith(@NotNull EnchantmentData data){
-        if (this.enchantment.equals(data.enchantment)){
-            return true;
-        }
-        if (this.incompatible.size() != 0){
-            for (Enchantment enchantment : this.incompatible){
-                if (enchantment.equals(data.enchantment)){
-                    return true;
-                }
-            }
-        }
-        if (data.incompatible.size() != 0){
-            for (Enchantment enchantment : data.incompatible){
-                if (enchantment.equals(this.enchantment)){
-                    return true;
-                }
-            }
-        }
-        return false;
+    public boolean collidesWith(@NotNull EnchantmentData data) {
+        return enchantment.equals(data.enchantment) || incompatible.contains(data.enchantment) || data.incompatible.contains(enchantment);
     }
 
     /**
-     * @return The default (and immutable) map of default NamespaceID -> EnchantmentData
+     * @return the default (and immutable) map of default NamespaceID -> EnchantmentData
      */
-    public static @NotNull Map<NamespaceID, EnchantmentData> getDefaultData(){
+    public static @NotNull Map<NamespaceID, EnchantmentData> getDefaultData() {
         return DEFAULT_DATA;
     }
 
     /**
-     * @return The default (and immutable) map of default enchantability data
+     * @return the default (and immutable) map of default enchantability data
      */
-    public static @NotNull Map<Material, Integer> getDefaultEnchantability(){
+    public static @NotNull Map<Material, Integer> getDefaultEnchantability() {
         return DEFAULT_ENCHANTABILITY;
     }
 
@@ -129,8 +113,7 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
             Map.entry(Enchantment.CHANNELING.namespace(), new EnchantmentData(Enchantment.CHANNELING, 1, SlotType::TRIDENT, multiply(25), constant(50)))
     );
 
-    // IntelliJ helpfully informed me that not including these supposedly "redundant" type arguments could slow down
-    // compilation and analysis!
+    // Including these supposedly helps speed up compilation and analysis
     @SuppressWarnings("RedundantTypeArguments")
     private static final @NotNull Map<Material, Integer> DEFAULT_ENCHANTABILITY = Map.<Material, Integer>ofEntries(
             Map.entry(Material.TRIDENT, 1),

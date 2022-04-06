@@ -60,7 +60,7 @@ public class EnchantmentManager {
 
     private final boolean useConcurrentHashMap, useDefaultEnchantmentData, useDefaultEnchantability;
 
-    private EnchantmentManager(@NotNull EnchantmentManager.Builder builder){
+    private EnchantmentManager(@NotNull EnchantmentManager.Builder builder) {
         this.useConcurrentHashMap = builder.useConcurrentHashMap;
         this.useDefaultEnchantmentData = builder.useDefaultEnchantmentData;
         this.useDefaultEnchantability = builder.useDefaultEnchantability;
@@ -74,7 +74,7 @@ public class EnchantmentManager {
      * This predicate acts identically to if you want to enchant an item and accept both treasure and non-treasure
      * enchantments. For example, this is the method you'd use if you wanted to enchant the items in end city chests.
      */
-    public static boolean discoverable(@NotNull EnchantmentData data){
+    public static boolean discoverable(@NotNull EnchantmentData data) {
         return data.enchantment().registry().isDiscoverable();
     }
 
@@ -86,7 +86,7 @@ public class EnchantmentManager {
      * This predicate acts identically to if you want to enchant an item and accept only non-treasure enchantments. For
      * example, this is the method you'd use if you wanted to enchant an item at an enchantment table.
      */
-    public static boolean discoverableAndNotTreasure(@NotNull EnchantmentData data){
+    public static boolean discoverableAndNotTreasure(@NotNull EnchantmentData data) {
         return data.enchantment().registry().isDiscoverable() && !data.enchantment().registry().isTreasureOnly();
     }
 
@@ -100,7 +100,7 @@ public class EnchantmentManager {
      * Basically, this is the default predicate that would be used anywhere in default Minecraft if you wanted to
      * enchant something.
      */
-    public static boolean alwaysAddIfBook(@NotNull ItemStack itemStack){
+    public static boolean alwaysAddIfBook(@NotNull ItemStack itemStack) {
         return itemStack.getMaterial() == Material.BOOK;
     }
 
@@ -114,9 +114,9 @@ public class EnchantmentManager {
      */
     public @NotNull ItemStack enchantWithLevels(@NotNull ItemStack itemStack, int levels, @NotNull Random random,
                                                 @NotNull Predicate<EnchantmentData> enchantmentPredicate,
-                                                @NotNull Predicate<ItemStack> alwaysAddPredicate){
+                                                @NotNull Predicate<ItemStack> alwaysAddPredicate) {
         final Map<Enchantment, Short> enchantments = new HashMap<>();
-        for (WeightedEnchant enchant : getEnchantsWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate)){
+        for (WeightedEnchant enchant : getEnchantsWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate)) {
             enchantments.put(enchant.data().enchantment(), (short) enchant.level());
         }
         return itemStack.withMeta(builder -> builder.enchantments(enchantments));
@@ -171,25 +171,26 @@ public class EnchantmentManager {
         Integer value = getEnchantability(itemStack.getMaterial());
         int enchantability = value == null ? 0 : value;
 
-        // Simplified version of the (official) code: levels += 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
         levels += 1 + random.nextInt((enchantability / 4) * 2 + 2);
 
-        // Simplified version of the (official) code: (random.nextDouble() + random.nextDouble() - 1) * 0.15;
-        double multiplier = random.nextDouble() - 0.5 * 0.3;
+        double multiplier = (random.nextDouble() - 0.5) * 0.3;
+
         levels = Math.max((int) Math.round(levels + levels * multiplier), 1);
 
         List<WeightedEnchant> list = getWeightedEnchantments(itemStack, levels, enchantmentPredicate, alwaysAddPredicate);
-        // Don't perform unnecessary calculations if the list is empty.
-        if (list.isEmpty()){
+
+        if (list.isEmpty()) {
             return enchants;
         }
 
+        // Store the total because there's no need to re-calculate it each time
         double total = 0;
         for (WeightedEnchant weightedEnchant : list) {
             total += weightedEnchant.data().weight();
         }
-        WeightedEnchant first = WeightedEnchant.getWeightedItemFrom(list, random.nextDouble() * total);
-        if (first == null){
+
+        WeightedEnchant first = WeightedEnchant.getItemFrom(list, random.nextDouble() * total);
+        if (first == null) {
             return enchants;
         }
         total -= first.getWeight();
@@ -197,7 +198,7 @@ public class EnchantmentManager {
 
         // Note that there is always a chance of this returning true, resulting in the very small chance of
         // getting an almost completely maxed item as long as you have a high enough level.
-        while(random.nextInt(50) <= levels){
+        while (random.nextInt(50) <= levels) {
             WeightedEnchant last = enchants.get(enchants.size() - 1);
             Iterator<WeightedEnchant> iterator = list.iterator();
             while (iterator.hasNext()) {
@@ -207,11 +208,11 @@ public class EnchantmentManager {
                     iterator.remove();
                 }
             }
-            if (list.isEmpty()){
+            if (list.isEmpty()) {
                 break;
             }
-            WeightedEnchant element = WeightedEnchant.getWeightedItemFrom(list, random.nextDouble() * total);
-            if (element != null){
+            WeightedEnchant element = WeightedEnchant.getItemFrom(list, random.nextDouble() * total);
+            if (element != null) {
                 total -= element.getWeight();
                 enchants.add(element);
             }
@@ -244,18 +245,18 @@ public class EnchantmentManager {
      */
     public @NotNull List<WeightedEnchant> getWeightedEnchantments(@NotNull ItemStack itemStack, int levels,
                                                                   @NotNull Predicate<EnchantmentData> enchantmentPredicate,
-                                                                  @NotNull Predicate<ItemStack> alwaysAddPredicate){
+                                                                  @NotNull Predicate<ItemStack> alwaysAddPredicate) {
         List<WeightedEnchant> enchants = new ArrayList<>();
         boolean addUnconditionally = alwaysAddPredicate.test(itemStack);
-        for (EnchantmentData data : this.getAllEnchantmentData()){
-            if (!enchantmentPredicate.test(data)){
+        for (EnchantmentData data : this.getAllEnchantmentData()) {
+            if (!enchantmentPredicate.test(data)) {
                 continue;
             }
-            if (!addUnconditionally && !data.slotType().canEnchant(itemStack)){
+            if (!addUnconditionally && !data.slotType().canEnchant(itemStack)) {
                 continue;
             }
-            for (int i = (int) data.enchantment().registry().maxLevel(); i > 0; i --){
-                if (levels >= data.getMinimumLevel(i) && levels <= data.getMaximumLevel(i)){
+            for (int i = (int) data.enchantment().registry().maxLevel(); i > 0; i--) {
+                if (levels >= data.getMinimumLevel(i) && levels <= data.getMaximumLevel(i)) {
                     enchants.add(new WeightedEnchant(data, i));
                     break;
                 }
@@ -264,24 +265,18 @@ public class EnchantmentManager {
         return enchants;
     }
 
-    private void initializeData(){
-        if (useConcurrentHashMap){
-            this.data = new ConcurrentHashMap<>();
-        } else {
-            this.data = new HashMap<>();
-        }
-        if (useDefaultEnchantmentData){
+    private void initializeData() {
+        this.data = useConcurrentHashMap ? new ConcurrentHashMap<>() : new HashMap<>();
+
+        if (useDefaultEnchantmentData) {
             this.data.putAll(EnchantmentData.getDefaultData());
         }
     }
 
-    private void initializeEnchantability(){
-        if (useConcurrentHashMap){
-            this.enchantability = new ConcurrentHashMap<>();
-        } else {
-            this.enchantability = new HashMap<>();
-        }
-        if (useDefaultEnchantability){
+    private void initializeEnchantability() {
+        this.enchantability = useConcurrentHashMap ? new ConcurrentHashMap<>() : new HashMap<>();
+
+        if (useDefaultEnchantability) {
             this.enchantability.putAll(EnchantmentData.getDefaultEnchantability());
         }
     }
@@ -291,8 +286,8 @@ public class EnchantmentManager {
      * @param key The key
      * @param data The value
      */
-    public void putEnchantmentData(@NotNull NamespaceID key, @NotNull EnchantmentData data){
-        if (this.data == null){
+    public void putEnchantmentData(@NotNull NamespaceID key, @NotNull EnchantmentData data) {
+        if (this.data == null) {
             this.initializeData();
         }
         this.data.put(key, data);
@@ -303,9 +298,9 @@ public class EnchantmentManager {
      * @param key The key to search
      * @return The data
      */
-    public @Nullable EnchantmentData getEnchantmentData(@NotNull NamespaceID key){
-        if (this.data == null){
-            if (useDefaultEnchantmentData){
+    public @Nullable EnchantmentData getEnchantmentData(@NotNull NamespaceID key) {
+        if (this.data == null) {
+            if (useDefaultEnchantmentData) {
                 return EnchantmentData.getDefaultData().get(key);
             }
             return null;
@@ -316,9 +311,9 @@ public class EnchantmentManager {
     /**
      * @return A collection of all the keys from this instance's EnchantmentData map.
      */
-    public @NotNull Collection<NamespaceID> getAllKeys(){
-        if (this.data == null){
-            if (useDefaultEnchantmentData){
+    public @NotNull Collection<NamespaceID> getAllKeys() {
+        if (this.data == null) {
+            if (useDefaultEnchantmentData) {
                 return Collections.unmodifiableCollection(EnchantmentData.getDefaultData().keySet());
             }
             return Collections.emptyList();
@@ -329,9 +324,9 @@ public class EnchantmentManager {
     /**
      * @return A collection of all the values from this instance's EnchantmentData map.
      */
-    public @NotNull Collection<EnchantmentData> getAllEnchantmentData(){
-        if (this.data == null){
-            if (useDefaultEnchantmentData){
+    public @NotNull Collection<EnchantmentData> getAllEnchantmentData() {
+        if (this.data == null) {
+            if (useDefaultEnchantmentData) {
                 return Collections.unmodifiableCollection(EnchantmentData.getDefaultData().values());
             }
             return Collections.emptyList();
@@ -343,10 +338,10 @@ public class EnchantmentManager {
      * Removes the provided key from this manager.
      * @param key The key to remove
      */
-    public void removeEnchantmentData(@NotNull NamespaceID key){
-        if (this.data == null){
+    public void removeEnchantmentData(@NotNull NamespaceID key) {
+        if (this.data == null) {
             // Don't initialize maps if there isn't a value to remove
-            if (!this.useDefaultEnchantmentData || !EnchantmentData.getDefaultData().containsKey(key)){
+            if (!this.useDefaultEnchantmentData || !EnchantmentData.getDefaultData().containsKey(key)) {
                 return;
             }
             this.initializeData();
@@ -359,10 +354,10 @@ public class EnchantmentManager {
      * @param material The material to set
      * @param value The value to associate with the material
      */
-    public void putEnchantability(@NotNull Material material, @NotNull Integer value){
-        if (this.enchantability == null){
+    public void putEnchantability(@NotNull Material material, @NotNull Integer value) {
+        if (this.enchantability == null) {
             // Don't initialize maps if the default is set to the provided value
-            if (this.useDefaultEnchantability && value.equals(EnchantmentData.getDefaultEnchantability().get(material))){
+            if (this.useDefaultEnchantability && value.equals(EnchantmentData.getDefaultEnchantability().get(material))) {
                 return;
             }
             this.initializeEnchantability();
@@ -375,9 +370,9 @@ public class EnchantmentManager {
      * @param material The material to search for
      * @return The enchantability value for the provided material
      */
-    public @Nullable Integer getEnchantability(@NotNull Material material){
-        if (this.enchantability == null){
-            if (useDefaultEnchantability){
+    public @Nullable Integer getEnchantability(@NotNull Material material) {
+        if (this.enchantability == null) {
+            if (useDefaultEnchantability) {
                 return EnchantmentData.getDefaultEnchantability().get(material);
             }
             return null;
@@ -389,7 +384,7 @@ public class EnchantmentManager {
      * Removes the provided material from this manager's enchantability map.
      * @param material The material to remove
      */
-    public void removeEnchantability(@NotNull Material material){
+    public void removeEnchantability(@NotNull Material material) {
         if (this.enchantability == null) {
             // Don't initialize maps if there isn't a value to remove
             if (this.useDefaultEnchantability && !EnchantmentData.getDefaultEnchantability().containsKey(material)) {
@@ -403,7 +398,7 @@ public class EnchantmentManager {
     /**
      * Returns a new EnchantmentManager.Builder instance
      */
-    public static @NotNull Builder builder(){
+    public static @NotNull Builder builder() {
         return new Builder();
     }
 
@@ -454,7 +449,8 @@ public class EnchantmentManager {
          * Creates a new EnchantmentManager from this builder. This is theoretically safe to run multiple times from the
          * same builder.
          */
-        public @NotNull EnchantmentManager build(){
+        @Contract(" -> new")
+        public @NotNull EnchantmentManager build() {
             return new EnchantmentManager(this);
         }
     }
