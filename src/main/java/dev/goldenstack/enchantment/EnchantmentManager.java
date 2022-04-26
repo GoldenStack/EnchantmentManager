@@ -54,7 +54,7 @@ import java.util.function.Predicate;
  */
 public class EnchantmentManager {
 
-    // Store builder and initialize data as null so we can lazily initialize values
+    // Store builder and initialize data as null so the maps can be lazily initialized
     private Map<NamespaceID, EnchantmentData> data = null;
     private Map<Material, Integer> enchantability = null;
 
@@ -101,7 +101,7 @@ public class EnchantmentManager {
      * enchant something.
      */
     public static boolean alwaysAddIfBook(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial() == Material.BOOK;
+        return itemStack.material() == Material.BOOK;
     }
 
     /**
@@ -139,8 +139,9 @@ public class EnchantmentManager {
      * one enchantment is always picked from the list of possible enchantments (unless the list is empty).<br>
      * All the code in the following list is under a {@code while} loop.<br>
      * <ul>
-     *     <li>There is a {@code levels / 50} probability that the loop decides to pick an enchantment. However, if the
-     *     chance would be 0/50, it is 1/50 instead.</li>
+     *     <li>There is a {@code levels / 50} probability that the loop decides to pick an enchantment. However, as the
+     *     random number internally generated can be zero and still continue the loop, the lowest chance of an
+     *     additional enchantment is actually 1/50.</li>
      *     <li>First, the most recently added enchantment gets all of its colliding enchantments removed from the list
      *     of possible enchantments. Since this is done before any other calculations, on the {@code while} loop's first
      *     iteration, it covers the collisions of the enchantment that was added before the loop started.</li>
@@ -149,7 +150,7 @@ public class EnchantmentManager {
      *     rules for picking an enchantment, so weights do affect how likely an enchantment is to get picked.</li>
      *     <li>Finally, the number of levels is divided by 2. Since the list of possible enchantments has already been
      *     calculated, the only effect this has is that it decreases the chance of another enchantment being picked
-     *     (unless the chance is already 1/50, which results in it staying the same).</li>
+     *     (unless the chance is already 1/50 or the level count is already 0, which results in it staying the same).</li>
      * </ul>
      * @param itemStack The ItemStack to randomize enchantments for
      * @param levels The number of levels to enchant with
@@ -168,7 +169,7 @@ public class EnchantmentManager {
                                                                 @NotNull Predicate<EnchantmentData> enchantmentPredicate,
                                                                 @NotNull Predicate<ItemStack> alwaysAddPredicate) {
         List<WeightedEnchant> enchants = new ArrayList<>();
-        Integer value = getEnchantability(itemStack.getMaterial());
+        Integer value = getEnchantability(itemStack.material());
         int enchantability = value == null ? 0 : value;
 
         levels += 1 + random.nextInt((enchantability / 4) * 2 + 2);

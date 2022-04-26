@@ -20,35 +20,35 @@ public interface SlotType {
      * @return true if the provided ItemStack's material is an armor piece
      */
     static boolean ARMOR(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial().isArmor();
+        return itemStack.material().isArmor();
     }
 
     /**
      * @return true if the provided ItemStack's material can be worn in the player's helmet slot
      */
     static boolean ARMOR_HELMET(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.HELMET;
+        return itemStack.material().registry().equipmentSlot() == EquipmentSlot.HELMET;
     }
 
     /**
      * @return true if the provided ItemStack's material can be worn in the player's chestplate slot
      */
     static boolean ARMOR_CHESTPLATE(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.CHESTPLATE;
+        return itemStack.material().registry().equipmentSlot() == EquipmentSlot.CHESTPLATE;
     }
 
     /**
      * @return true if the provided ItemStack's material can be worn in the player's leggings slot
      */
     static boolean ARMOR_LEGGINGS(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.LEGGINGS;
+        return itemStack.material().registry().equipmentSlot() == EquipmentSlot.LEGGINGS;
     }
 
     /**
      * @return true if the provided ItemStack's material can be worn in the player's boots slot
      */
     static boolean ARMOR_FEET(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial().registry().equipmentSlot() == EquipmentSlot.BOOTS;
+        return itemStack.material().registry().equipmentSlot() == EquipmentSlot.BOOTS;
     }
 
     /**
@@ -56,7 +56,7 @@ public interface SlotType {
      * enchantment manager, not an anvil manager.
      */
     static boolean WEAPON(@NotNull ItemStack itemStack) {
-        Material material = itemStack.getMaterial();
+        Material material = itemStack.material();
         return material == Material.WOODEN_SWORD || material == Material.STONE_SWORD || material == Material.IRON_SWORD ||
                 material == Material.GOLDEN_SWORD || material == Material.DIAMOND_SWORD || material == Material.NETHERITE_SWORD;
     }
@@ -65,7 +65,7 @@ public interface SlotType {
      * @return true if the provided ItemStack's material is any type of tool (pickaxe, axe, shovel, or hoe)
      */
     static boolean TOOL(@NotNull ItemStack itemStack) {
-        Material material = itemStack.getMaterial();
+        Material material = itemStack.material();
         return material == Material.WOODEN_PICKAXE || material == Material.WOODEN_AXE || material == Material.WOODEN_SHOVEL || material == Material.WOODEN_HOE ||
                 material == Material.STONE_PICKAXE || material == Material.STONE_AXE || material == Material.STONE_SHOVEL || material == Material.STONE_HOE ||
                 material == Material.IRON_PICKAXE || material == Material.IRON_AXE || material == Material.IRON_SHOVEL || material == Material.IRON_HOE ||
@@ -78,28 +78,28 @@ public interface SlotType {
      * @return true if the provided ItemStack's material is {@link Material#FISHING_ROD}
      */
     static boolean FISHING_ROD(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial() == Material.FISHING_ROD;
+        return itemStack.material() == Material.FISHING_ROD;
     }
 
     /**
      * @return true if the provided ItemStack's material is {@link Material#TRIDENT}
      */
     static boolean TRIDENT(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial() == Material.TRIDENT;
+        return itemStack.material() == Material.TRIDENT;
     }
 
     /**
      * @return true if the provided ItemStack's material is {@link Material#BOW}
      */
     static boolean BOW(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial() == Material.BOW;
+        return itemStack.material() == Material.BOW;
     }
 
     /**
      * @return true if the provided ItemStack's material is {@link Material#CROSSBOW}
      */
     static boolean CROSSBOW(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial() == Material.CROSSBOW;
+        return itemStack.material() == Material.CROSSBOW;
     }
 
 
@@ -117,7 +117,7 @@ public interface SlotType {
      * </ul>
      */
     static boolean WEARABLE(@NotNull ItemStack itemStack) {
-        Material material = itemStack.getMaterial();
+        Material material = itemStack.material();
         return material.isArmor() || material == Material.CARVED_PUMPKIN || material == Material.ELYTRA ||
                 material == Material.PLAYER_HEAD || material == Material.ZOMBIE_HEAD || material == Material.SKELETON_SKULL ||
                 material == Material.WITHER_SKELETON_SKULL || material == Material.CREEPER_HEAD || material == Material.DRAGON_HEAD;
@@ -127,7 +127,7 @@ public interface SlotType {
      * @return true if the provided ItemStack's material has durability
      */
     static boolean BREAKABLE(@NotNull ItemStack itemStack) {
-        return itemStack.getMaterial().registry().maxDamage() != 0;
+        return itemStack.material().registry().maxDamage() != 0;
     }
 
     /**
