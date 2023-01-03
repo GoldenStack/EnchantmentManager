@@ -114,7 +114,6 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
     );
 
     // Including these supposedly helps speed up compilation and analysis
-    @SuppressWarnings("RedundantTypeArguments")
     private static final @NotNull Map<Material, Integer> DEFAULT_ENCHANTABILITY = Map.<Material, Integer>ofEntries(
             Map.entry(Material.TRIDENT, 1),
             Map.entry(Material.BOOK, 1),

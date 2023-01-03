@@ -4,7 +4,6 @@ import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.utils.NamespaceID;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,16 +19,9 @@ import java.util.function.Predicate;
  * sharpness can be added to axes.<br>
  * Each instance stores its own enchantability and EnchantmentData maps, so other extensions can't mess up yours if you
  * don't want them to.<br>
- * You are completely free to modify the tables that this class has. If you have concurrency issues for some reason,
- * consider enabling the {@link EnchantmentManager.Builder#useConcurrentHashMap(boolean)} setting.<br>
- * EnchantmentManager instances have their EnchantmentData and enchantability maps lazily initialized. In this case,
- * this means that they do not get created until the user needs them. When you have the
- * {@code useDefaultEnchantmentData} or {@code useDefaultEnchantability} settings enabled and the map for it has not
- * been initialized, it will grab the data from the default map instead of creating a new one.<br>
  * <br>
  * <h3>Guide to implementing default Minecraft enchanting</h3>
- * Obviously, you have to create a new {@code EnchantmentManager} instance via the builder. You can set {@code
- * useConcurrentHashMap} to whatever you want, but keep the other settings as the default.<br>
+ * Just initialize a new manager with both parameters as true if you want the default values for everything.
  * Run {@link EnchantmentManager#enchantWithLevels(ItemStack, int, Random, Predicate, Predicate)
  * manager.enchantWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate} where:
  * <ul>
@@ -49,21 +41,28 @@ import java.util.function.Predicate;
  * <br>
  * Here is some correct but extremely unorthodox code so you can see an example. Since this is just example code, it's
  * not a good idea to actually use this example for anything.<br>
- * <code>EnchantmentManager.builder().build().enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(),
+ * <code>new EnchantmentManager(true, true).enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(),
  * EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook)</code>
  */
 public class EnchantmentManager {
 
-    // Store builder and initialize data as null so the maps can be lazily initialized
-    private Map<NamespaceID, EnchantmentData> data = null;
-    private Map<Material, Integer> enchantability = null;
+    private final @NotNull Map<NamespaceID, EnchantmentData> data = new ConcurrentHashMap<>();
+    private final @NotNull Map<Material, Integer> enchantability = new ConcurrentHashMap<>();
 
-    private final boolean useConcurrentHashMap, useDefaultEnchantmentData, useDefaultEnchantability;
-
-    private EnchantmentManager(@NotNull EnchantmentManager.Builder builder) {
-        this.useConcurrentHashMap = builder.useConcurrentHashMap;
-        this.useDefaultEnchantmentData = builder.useDefaultEnchantmentData;
-        this.useDefaultEnchantability = builder.useDefaultEnchantability;
+    /**
+     * Creates a new EnchantmentManager with the provided settings
+     * @param useDefaultEnchantmentData when true, automatically registers the default enchantment data from
+     * {@link EnchantmentData#getDefaultData()}
+     * @param useDefaultEnchantability when true, automatically registers the default enchantability values from
+     * {@link EnchantmentData#getDefaultEnchantability()}
+     */
+    public EnchantmentManager(boolean useDefaultEnchantmentData, boolean useDefaultEnchantability) {
+        if (useDefaultEnchantmentData) {
+            data.putAll(EnchantmentData.getDefaultData());
+        }
+        if (useDefaultEnchantability) {
+            enchantability.putAll(EnchantmentData.getDefaultEnchantability());
+        }
     }
 
     /**
@@ -267,31 +266,12 @@ public class EnchantmentManager {
         return enchants;
     }
 
-    private void initializeData() {
-        this.data = useConcurrentHashMap ? new ConcurrentHashMap<>() : new HashMap<>();
-
-        if (useDefaultEnchantmentData) {
-            this.data.putAll(EnchantmentData.getDefaultData());
-        }
-    }
-
-    private void initializeEnchantability() {
-        this.enchantability = useConcurrentHashMap ? new ConcurrentHashMap<>() : new HashMap<>();
-
-        if (useDefaultEnchantability) {
-            this.enchantability.putAll(EnchantmentData.getDefaultEnchantability());
-        }
-    }
-
     /**
      * Associates the key with the provided EnchantmentData.
      * @param key The key
      * @param data The value
      */
     public void putEnchantmentData(@NotNull NamespaceID key, @NotNull EnchantmentData data) {
-        if (this.data == null) {
-            this.initializeData();
-        }
         this.data.put(key, data);
     }
 
@@ -301,12 +281,6 @@ public class EnchantmentManager {
      * @return The data
      */
     public @Nullable EnchantmentData getEnchantmentData(@NotNull NamespaceID key) {
-        if (this.data == null) {
-            if (useDefaultEnchantmentData) {
-                return EnchantmentData.getDefaultData().get(key);
-            }
-            return null;
-        }
         return this.data.get(key);
     }
 
@@ -314,12 +288,6 @@ public class EnchantmentManager {
      * @return A collection of all the keys from this instance's EnchantmentData map.
      */
     public @NotNull Collection<NamespaceID> getAllKeys() {
-        if (this.data == null) {
-            if (useDefaultEnchantmentData) {
-                return Collections.unmodifiableCollection(EnchantmentData.getDefaultData().keySet());
-            }
-            return Collections.emptyList();
-        }
         return Collections.unmodifiableCollection(this.data.keySet());
     }
 
@@ -327,12 +295,6 @@ public class EnchantmentManager {
      * @return A collection of all the values from this instance's EnchantmentData map.
      */
     public @NotNull Collection<EnchantmentData> getAllEnchantmentData() {
-        if (this.data == null) {
-            if (useDefaultEnchantmentData) {
-                return Collections.unmodifiableCollection(EnchantmentData.getDefaultData().values());
-            }
-            return Collections.emptyList();
-        }
         return Collections.unmodifiableCollection(this.data.values());
     }
 
@@ -341,13 +303,6 @@ public class EnchantmentManager {
      * @param key The key to remove
      */
     public void removeEnchantmentData(@NotNull NamespaceID key) {
-        if (this.data == null) {
-            // Don't initialize maps if there isn't a value to remove
-            if (!this.useDefaultEnchantmentData || !EnchantmentData.getDefaultData().containsKey(key)) {
-                return;
-            }
-            this.initializeData();
-        }
         this.data.remove(key);
     }
 
@@ -357,13 +312,6 @@ public class EnchantmentManager {
      * @param value The value to associate with the material
      */
     public void putEnchantability(@NotNull Material material, @NotNull Integer value) {
-        if (this.enchantability == null) {
-            // Don't initialize maps if the default is set to the provided value
-            if (this.useDefaultEnchantability && value.equals(EnchantmentData.getDefaultEnchantability().get(material))) {
-                return;
-            }
-            this.initializeEnchantability();
-        }
         this.enchantability.put(material, value);
     }
 
@@ -373,12 +321,6 @@ public class EnchantmentManager {
      * @return The enchantability value for the provided material
      */
     public @Nullable Integer getEnchantability(@NotNull Material material) {
-        if (this.enchantability == null) {
-            if (useDefaultEnchantability) {
-                return EnchantmentData.getDefaultEnchantability().get(material);
-            }
-            return null;
-        }
         return this.enchantability.get(material);
     }
 
@@ -387,73 +329,7 @@ public class EnchantmentManager {
      * @param material The material to remove
      */
     public void removeEnchantability(@NotNull Material material) {
-        if (this.enchantability == null) {
-            // Don't initialize maps if there isn't a value to remove
-            if (this.useDefaultEnchantability && !EnchantmentData.getDefaultEnchantability().containsKey(material)) {
-                return;
-            }
-            this.initializeEnchantability();
-        }
         this.enchantability.remove(material);
     }
 
-    /**
-     * Returns a new EnchantmentManager.Builder instance
-     */
-    public static @NotNull Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Utility class for building EnchantmentManager instances
-     */
-    public static class Builder {
-        private boolean useConcurrentHashMap = false,
-                        useDefaultEnchantmentData = true,
-                        useDefaultEnchantability = true;
-
-        private Builder(){}
-
-        /**
-         * When true, makes all instances created with this builder use concurrent hash maps instead of normal hash
-         * maps.<br>
-         * Default: {@code false}<
-         */
-        @Contract("_ -> this")
-        public @NotNull Builder useConcurrentHashMap(boolean useConcurrentHashMap) {
-            this.useConcurrentHashMap = useConcurrentHashMap;
-            return this;
-        }
-
-        /**
-         * When true, automatically adds the default enchantment data from {@link EnchantmentData#getDefaultData()} to
-         * any EnchantmentManager instances that are created from this instance.<br>
-         * Default: {@code true}
-         */
-        @Contract("_ -> this")
-        public @NotNull Builder useDefaultEnchantmentData(boolean useDefaultEnchantmentData) {
-            this.useDefaultEnchantmentData = useDefaultEnchantmentData;
-            return this;
-        }
-
-        /**
-         * When true, automatically adds the default enchantability values from {@link EnchantmentData#getDefaultEnchantability()}
-         * to any EnchantmentManager instances that are created from this builder.<br>
-         * Default: {@code true}
-         */
-        @Contract("_ -> this")
-        public @NotNull Builder useDefaultEnchantability(boolean useDefaultEnchantability) {
-            this.useDefaultEnchantability = useDefaultEnchantability;
-            return this;
-        }
-
-        /**
-         * Creates a new EnchantmentManager from this builder. This is theoretically safe to run multiple times from the
-         * same builder.
-         */
-        @Contract(" -> new")
-        public @NotNull EnchantmentManager build() {
-            return new EnchantmentManager(this);
-        }
-    }
 }
