@@ -128,11 +128,12 @@ public class EnchantmentManager {
      * <ul>
      *     <li>The level is automatically incremented by 1. Note that this is before all other calculations so it can
      *     easily be manipulated.</li>
-     *     <li>For each 4 enchantability points (rounded down), 0 to 2 extra levels are added to the calculation.</li>
-     *     <li>Additionally, 0 to 2 levels are added regardless of the item's
-     *     enchantability.</li>
-     *     <li>The current level is then multiplied by a random number from 0.85 to 1.15, and then rounded
-     *     to the nearest integer.</li>
+     *     <li>A random number of levels from {@code 0} to {@code (enchantability / 2) + 2} are added to the total. The
+     *     number is picked with somewhat normal distribution according to the central limit theorem (as it's simply two
+     *     equally ranged random numbers added together).</li>
+     *     <li>The current level is then multiplied by a random number from 0.85 to 1.15 (again, following roughly
+     *     normal distribution as it's just two equally ranged random numbers added together), and then rounded to the
+     *     nearest integer.</li>
      * </ul>
      * After the manipulations to the level count, the enchantments must be randomly picked from the list of
      * enchantments retrieved from {@link #getWeightedEnchantments(ItemStack, int, Predicate, Predicate)}. Importantly,
@@ -172,11 +173,11 @@ public class EnchantmentManager {
         Integer value = getEnchantability(itemStack.material());
         int enchantability = value == null ? 0 : value;
 
-        levels += 1 + random.nextInt((enchantability / 4) * 2 + 2);
+        levels += 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
 
-        double multiplier = (random.nextDouble() - 0.5) * 0.3;
+        double multiplier = (random.nextDouble() + random.nextDouble() - 1) * 0.15;
 
-        levels = Math.max((int) Math.round(levels + levels * multiplier), 1);
+        levels = Math.max((int) Math.round(levels * (1 + multiplier)), 1);
 
         List<WeightedEnchant> list = getWeightedEnchantments(itemStack, levels, enchantmentPredicate, alwaysAddPredicate);
 
