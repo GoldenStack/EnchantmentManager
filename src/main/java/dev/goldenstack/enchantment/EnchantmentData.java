@@ -6,7 +6,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.Material;
 import net.minestom.server.utils.NamespaceID;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 import java.util.Map;
@@ -76,44 +78,44 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
     }
 
     private static final @NotNull Map<NamespaceID, EnchantmentData> DEFAULT_DATA = Map.ofEntries(
-            Map.entry(Enchantment.FIRE_PROTECTION.namespace(), new EnchantmentData(Enchantment.FIRE_PROTECTION, 5, SlotType::ARMOR, adjusted(10, 8), addToMin(8), Enchantment.PROTECTION, Enchantment.BLAST_PROTECTION, Enchantment.PROJECTILE_PROTECTION)),
-            Map.entry(Enchantment.KNOCKBACK.namespace(), new EnchantmentData(Enchantment.KNOCKBACK, 5, SlotType::WEAPON, adjusted(5, 20), addToDefault(50))),
-            Map.entry(Enchantment.MENDING.namespace(), new EnchantmentData(Enchantment.MENDING, 2, SlotType::BREAKABLE, multiply(25), addToMin(50))),
-            Map.entry(Enchantment.POWER.namespace(), new EnchantmentData(Enchantment.POWER, 10, SlotType::BOW, adjusted(1, 10), addToMin(15))),
-            Map.entry(Enchantment.LUCK_OF_THE_SEA.namespace(), new EnchantmentData(Enchantment.LUCK_OF_THE_SEA, 2, SlotType::FISHING_ROD, adjusted(15, 9), addToDefault(50))),
-            Map.entry(Enchantment.THORNS.namespace(), new EnchantmentData(Enchantment.THORNS, 1, SlotType::ARMOR, adjusted(10, 20), addToDefault(50))),
-            Map.entry(Enchantment.SWEEPING.namespace(), new EnchantmentData(Enchantment.SWEEPING, 2, SlotType::WEAPON, adjusted(5, 9), addToMin(15))),
-            Map.entry(Enchantment.FEATHER_FALLING.namespace(), new EnchantmentData(Enchantment.FEATHER_FALLING, 5, SlotType::ARMOR_FEET, adjusted(5, 6), addToMin(6))),
-            Map.entry(Enchantment.FLAME.namespace(), new EnchantmentData(Enchantment.FLAME, 2, SlotType::BOW, multiply(20), constant(50))),
-            Map.entry(Enchantment.BINDING_CURSE.namespace(), new EnchantmentData(Enchantment.BINDING_CURSE, 1, SlotType::ARMOR, multiply(25), constant(50))),
-            Map.entry(Enchantment.AQUA_AFFINITY.namespace(), new EnchantmentData(Enchantment.AQUA_AFFINITY, 2, SlotType::ARMOR_HELMET, multiply(1), addToMin(40))),
-            Map.entry(Enchantment.PROJECTILE_PROTECTION.namespace(), new EnchantmentData(Enchantment.PROJECTILE_PROTECTION, 5, SlotType::ARMOR, adjusted(3, 6), addToMin(6), Enchantment.PROTECTION, Enchantment.BLAST_PROTECTION, Enchantment.FIRE_PROTECTION)),
-            Map.entry(Enchantment.SMITE.namespace(), new EnchantmentData(Enchantment.SMITE, 5, SlotType::WEAPON, adjusted(5, 8), addToMin(20), Enchantment.SHARPNESS, Enchantment.BANE_OF_ARTHROPODS)),
-            Map.entry(Enchantment.FROST_WALKER.namespace(), new EnchantmentData(Enchantment.FROST_WALKER, 2, SlotType::ARMOR_FEET, multiply(10), addToMin(15), Enchantment.DEPTH_STRIDER)),
-            Map.entry(Enchantment.VANISHING_CURSE.namespace(), new EnchantmentData(Enchantment.VANISHING_CURSE, 1, SlotType::ALL, multiply(25), constant(50))),
-            Map.entry(Enchantment.PUNCH.namespace(), new EnchantmentData(Enchantment.PUNCH, 2, SlotType::BOW, adjusted(12, 20), addToMin(25))),
-            Map.entry(Enchantment.BLAST_PROTECTION.namespace(), new EnchantmentData(Enchantment.BLAST_PROTECTION, 2, SlotType::ARMOR, adjusted(5, 8), addToMin(8), Enchantment.PROTECTION, Enchantment.FIRE_PROTECTION, Enchantment.PROJECTILE_PROTECTION)),
-            Map.entry(Enchantment.IMPALING.namespace(), new EnchantmentData(Enchantment.IMPALING, 2, SlotType::TRIDENT, adjusted(1, 8), addToMin(20))),
-            Map.entry(Enchantment.BANE_OF_ARTHROPODS.namespace(), new EnchantmentData(Enchantment.BANE_OF_ARTHROPODS, 5, SlotType::WEAPON, adjusted(5, 8), addToMin(20), Enchantment.SHARPNESS, Enchantment.SMITE)),
-            Map.entry(Enchantment.SHARPNESS.namespace(), new EnchantmentData(Enchantment.SHARPNESS, 10, SlotType::WEAPON, adjusted(1, 11), addToMin(20), Enchantment.SMITE, Enchantment.BANE_OF_ARTHROPODS)),
-            Map.entry(Enchantment.EFFICIENCY.namespace(), new EnchantmentData(Enchantment.EFFICIENCY, 10, SlotType::TOOL, adjusted(1, 10), addToDefault(50))),
-            Map.entry(Enchantment.SILK_TOUCH.namespace(), new EnchantmentData(Enchantment.SILK_TOUCH, 1, SlotType::TOOL, multiply(15), addToDefault(50), Enchantment.FORTUNE)),
-            Map.entry(Enchantment.LOOTING.namespace(), new EnchantmentData(Enchantment.LOOTING, 2, SlotType::WEAPON, adjusted(15, 9), addToDefault(50))),
-            Map.entry(Enchantment.LURE.namespace(), new EnchantmentData(Enchantment.LURE, 2, SlotType::FISHING_ROD, adjusted(15, 9), addToDefault(50))),
-            Map.entry(Enchantment.DEPTH_STRIDER.namespace(), new EnchantmentData(Enchantment.DEPTH_STRIDER, 2, SlotType::ARMOR_FEET, multiply(10), addToMin(15), Enchantment.FROST_WALKER)),
-            Map.entry(Enchantment.SOUL_SPEED.namespace(), new EnchantmentData(Enchantment.SOUL_SPEED, 1, SlotType::ARMOR_FEET, multiply(10), addToMin(15))),
-            Map.entry(Enchantment.RESPIRATION.namespace(), new EnchantmentData(Enchantment.RESPIRATION, 2, SlotType::ARMOR_HELMET, multiply(10), addToMin(30))),
-            Map.entry(Enchantment.FIRE_ASPECT.namespace(), new EnchantmentData(Enchantment.FIRE_ASPECT, 2, SlotType::WEAPON, adjusted(10, 20), addToDefault(50))),
-            Map.entry(Enchantment.PIERCING.namespace(), new EnchantmentData(Enchantment.PIERCING, 10, SlotType::CROSSBOW, adjusted(1, 10), constant(50), Enchantment.MULTISHOT)),
-            Map.entry(Enchantment.LOYALTY.namespace(), new EnchantmentData(Enchantment.LOYALTY, 5, SlotType::TRIDENT, basic(5, 7), constant(50))),
-            Map.entry(Enchantment.UNBREAKING.namespace(), new EnchantmentData(Enchantment.UNBREAKING, 5, SlotType::BREAKABLE, adjusted(5, 8), addToDefault(50))),
-            Map.entry(Enchantment.RIPTIDE.namespace(), new EnchantmentData(Enchantment.RIPTIDE, 2, SlotType::TRIDENT, basic(10, 7), constant(50), Enchantment.LOYALTY, Enchantment.CHANNELING)),
-            Map.entry(Enchantment.QUICK_CHARGE.namespace(), new EnchantmentData(Enchantment.QUICK_CHARGE, 5, SlotType::CROSSBOW, adjusted(12, 20), constant(50))),
-            Map.entry(Enchantment.PROTECTION.namespace(), new EnchantmentData(Enchantment.PROTECTION, 10, SlotType::ARMOR, adjusted(1, 11), addToMin(11), Enchantment.BLAST_PROTECTION, Enchantment.FIRE_PROTECTION, Enchantment.PROJECTILE_PROTECTION)),
-            Map.entry(Enchantment.INFINITY.namespace(), new EnchantmentData(Enchantment.INFINITY, 1, SlotType::BOW, multiply(20), constant(50), Enchantment.MENDING)),
-            Map.entry(Enchantment.FORTUNE.namespace(), new EnchantmentData(Enchantment.FORTUNE, 2, SlotType::TOOL, adjusted(15, 9), addToDefault(50), Enchantment.SILK_TOUCH)),
-            Map.entry(Enchantment.MULTISHOT.namespace(), new EnchantmentData(Enchantment.MULTISHOT, 2, SlotType::CROSSBOW, multiply(20), constant(50), Enchantment.PIERCING)),
-            Map.entry(Enchantment.CHANNELING.namespace(), new EnchantmentData(Enchantment.CHANNELING, 1, SlotType::TRIDENT, multiply(25), constant(50)))
+            create(Enchantment.FIRE_PROTECTION, 5, SlotType::ARMOR, adjusted(10, 8), addToMin(8), Enchantment.PROTECTION, Enchantment.BLAST_PROTECTION, Enchantment.PROJECTILE_PROTECTION),
+            create(Enchantment.KNOCKBACK, 5, SlotType::WEAPON, adjusted(5, 20), addToDefault(50)),
+            create(Enchantment.MENDING, 2, SlotType::BREAKABLE, multiply(25), addToMin(50)),
+            create(Enchantment.POWER, 10, SlotType::BOW, adjusted(1, 10), addToMin(15)),
+            create(Enchantment.LUCK_OF_THE_SEA, 2, SlotType::FISHING_ROD, adjusted(15, 9), addToDefault(50)),
+            create(Enchantment.THORNS, 1, SlotType::ARMOR, adjusted(10, 20), addToDefault(50)),
+            create(Enchantment.SWEEPING, 2, SlotType::WEAPON, adjusted(5, 9), addToMin(15)),
+            create(Enchantment.FEATHER_FALLING, 5, SlotType::ARMOR_FEET, adjusted(5, 6), addToMin(6)),
+            create(Enchantment.FLAME, 2, SlotType::BOW, multiply(20), constant(50)),
+            create(Enchantment.BINDING_CURSE, 1, SlotType::ARMOR, multiply(25), constant(50)),
+            create(Enchantment.AQUA_AFFINITY, 2, SlotType::ARMOR_HELMET, multiply(1), addToMin(40)),
+            create(Enchantment.PROJECTILE_PROTECTION, 5, SlotType::ARMOR, adjusted(3, 6), addToMin(6), Enchantment.PROTECTION, Enchantment.BLAST_PROTECTION, Enchantment.FIRE_PROTECTION),
+            create(Enchantment.SMITE, 5, SlotType::WEAPON, adjusted(5, 8), addToMin(20), Enchantment.SHARPNESS, Enchantment.BANE_OF_ARTHROPODS),
+            create(Enchantment.FROST_WALKER, 2, SlotType::ARMOR_FEET, multiply(10), addToMin(15), Enchantment.DEPTH_STRIDER),
+            create(Enchantment.VANISHING_CURSE, 1, SlotType::ALL, multiply(25), constant(50)),
+            create(Enchantment.PUNCH, 2, SlotType::BOW, adjusted(12, 20), addToMin(25)),
+            create(Enchantment.BLAST_PROTECTION, 2, SlotType::ARMOR, adjusted(5, 8), addToMin(8), Enchantment.PROTECTION, Enchantment.FIRE_PROTECTION, Enchantment.PROJECTILE_PROTECTION),
+            create(Enchantment.IMPALING, 2, SlotType::TRIDENT, adjusted(1, 8), addToMin(20)),
+            create(Enchantment.BANE_OF_ARTHROPODS, 5, SlotType::WEAPON, adjusted(5, 8), addToMin(20), Enchantment.SHARPNESS, Enchantment.SMITE),
+            create(Enchantment.SHARPNESS, 10, SlotType::WEAPON, adjusted(1, 11), addToMin(20), Enchantment.SMITE, Enchantment.BANE_OF_ARTHROPODS),
+            create(Enchantment.EFFICIENCY, 10, SlotType::TOOL, adjusted(1, 10), addToDefault(50)),
+            create(Enchantment.SILK_TOUCH, 1, SlotType::TOOL, multiply(15), addToDefault(50), Enchantment.FORTUNE),
+            create(Enchantment.LOOTING, 2, SlotType::WEAPON, adjusted(15, 9), addToDefault(50)),
+            create(Enchantment.LURE, 2, SlotType::FISHING_ROD, adjusted(15, 9), addToDefault(50)),
+            create(Enchantment.DEPTH_STRIDER, 2, SlotType::ARMOR_FEET, multiply(10), addToMin(15), Enchantment.FROST_WALKER),
+            create(Enchantment.SOUL_SPEED, 1, SlotType::ARMOR_FEET, multiply(10), addToMin(15)),
+            create(Enchantment.RESPIRATION, 2, SlotType::ARMOR_HELMET, multiply(10), addToMin(30)),
+            create(Enchantment.FIRE_ASPECT, 2, SlotType::WEAPON, adjusted(10, 20), addToDefault(50)),
+            create(Enchantment.PIERCING, 10, SlotType::CROSSBOW, adjusted(1, 10), constant(50), Enchantment.MULTISHOT),
+            create(Enchantment.LOYALTY, 5, SlotType::TRIDENT, basic(5, 7), constant(50)),
+            create(Enchantment.UNBREAKING, 5, SlotType::BREAKABLE, adjusted(5, 8), addToDefault(50)),
+            create(Enchantment.RIPTIDE, 2, SlotType::TRIDENT, basic(10, 7), constant(50), Enchantment.LOYALTY, Enchantment.CHANNELING),
+            create(Enchantment.QUICK_CHARGE, 5, SlotType::CROSSBOW, adjusted(12, 20), constant(50)),
+            create(Enchantment.PROTECTION, 10, SlotType::ARMOR, adjusted(1, 11), addToMin(11), Enchantment.BLAST_PROTECTION, Enchantment.FIRE_PROTECTION, Enchantment.PROJECTILE_PROTECTION),
+            create(Enchantment.INFINITY, 1, SlotType::BOW, multiply(20), constant(50), Enchantment.MENDING),
+            create(Enchantment.FORTUNE, 2, SlotType::TOOL, adjusted(15, 9), addToDefault(50), Enchantment.SILK_TOUCH),
+            create(Enchantment.MULTISHOT, 2, SlotType::CROSSBOW, multiply(20), constant(50), Enchantment.PIERCING),
+            create(Enchantment.CHANNELING, 1, SlotType::TRIDENT, multiply(25), constant(50))
     );
 
     private static final @NotNull Object2IntMap<Material> DEFAULT_ENCHANTABILITY;
@@ -147,5 +149,15 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
         for (var material : materials) {
             map.put(material, value);
         }
+    }
+
+    @Contract("_, _, _, _, _, _ -> new")
+    private static @NotNull Map.@Unmodifiable Entry<NamespaceID, EnchantmentData> create(@NotNull Enchantment enchantment,
+                                                                                         int weight,
+                                                                                         @NotNull SlotType slotType,
+                                                                                         @NotNull LevelProvider minimumLevelProvider,
+                                                                                         @NotNull LevelProvider maximumLevelProvider,
+                                                                                         @NotNull Enchantment @NotNull ... incompatible) {
+        return Map.entry(enchantment.namespace(), new EnchantmentData(enchantment, weight, slotType, minimumLevelProvider, maximumLevelProvider, incompatible));
     }
 }
