@@ -1,5 +1,8 @@
 package dev.goldenstack.enchantment;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -8,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 /**
@@ -44,25 +46,24 @@ import java.util.function.Predicate;
  * <code>new EnchantmentManager(true, true).enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(),
  * EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook)</code>
  */
-public class EnchantmentManager {
-
-    private final @NotNull Map<NamespaceID, EnchantmentData> data = new ConcurrentHashMap<>();
-    private final @NotNull Map<Material, Integer> enchantability = new ConcurrentHashMap<>();
+public record EnchantmentManager(@NotNull Map<NamespaceID, EnchantmentData> enchantmentData,
+                                 @NotNull Object2IntMap<Material> enchantability) {
 
     /**
-     * Creates a new EnchantmentManager with the provided settings
-     * @param useDefaultEnchantmentData when true, automatically registers the default enchantment data from
-     * {@link EnchantmentData#getDefaultData()}
-     * @param useDefaultEnchantability when true, automatically registers the default enchantability values from
-     * {@link EnchantmentData#getDefaultEnchantability()}
+     * Creates an enchantment manager with the default data (from {@link EnchantmentData#getDefaultData()}) and
+     * enchantability values (from {@link EnchantmentData#getDefaultEnchantability()}).
+     * @return the new manager
      */
-    public EnchantmentManager(boolean useDefaultEnchantmentData, boolean useDefaultEnchantability) {
-        if (useDefaultEnchantmentData) {
-            data.putAll(EnchantmentData.getDefaultData());
-        }
-        if (useDefaultEnchantability) {
-            enchantability.putAll(EnchantmentData.getDefaultEnchantability());
-        }
+    public static @NotNull EnchantmentManager fromDefaults() {
+        return new EnchantmentManager(
+                EnchantmentData.getDefaultData(),
+                EnchantmentData.getDefaultEnchantability()
+        );
+    }
+
+    public EnchantmentManager {
+        enchantmentData = Map.copyOf(enchantmentData);
+        enchantability = Object2IntMaps.unmodifiable(new Object2IntOpenHashMap<>(enchantability));
     }
 
     /**
@@ -169,8 +170,7 @@ public class EnchantmentManager {
                                                                 @NotNull Predicate<EnchantmentData> enchantmentPredicate,
                                                                 @NotNull Predicate<ItemStack> alwaysAddPredicate) {
         List<WeightedEnchant> enchants = new ArrayList<>();
-        Integer value = getEnchantability(itemStack.material());
-        int enchantability = value == null ? 0 : value;
+        int enchantability = getEnchantability(itemStack.material());
 
         levels += 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
 
@@ -249,7 +249,7 @@ public class EnchantmentManager {
                                                                   @NotNull Predicate<ItemStack> alwaysAddPredicate) {
         List<WeightedEnchant> enchants = new ArrayList<>();
         boolean addUnconditionally = alwaysAddPredicate.test(itemStack);
-        for (EnchantmentData data : this.getAllEnchantmentData()) {
+        for (EnchantmentData data : this.enchantmentData().values()) {
             if (!enchantmentPredicate.test(data)) {
                 continue;
             }
@@ -267,52 +267,12 @@ public class EnchantmentManager {
     }
 
     /**
-     * Associates the key with the provided EnchantmentData.
-     * @param key The key
-     * @param data The value
-     */
-    public void putEnchantmentData(@NotNull NamespaceID key, @NotNull EnchantmentData data) {
-        this.data.put(key, data);
-    }
-
-    /**
      * Finds the EnchantmentData instance that is associated with the provided key.
      * @param key The key to search
      * @return The data
      */
     public @Nullable EnchantmentData getEnchantmentData(@NotNull NamespaceID key) {
-        return this.data.get(key);
-    }
-
-    /**
-     * @return A collection of all the keys from this instance's EnchantmentData map.
-     */
-    public @NotNull Collection<NamespaceID> getAllKeys() {
-        return Collections.unmodifiableCollection(this.data.keySet());
-    }
-
-    /**
-     * @return A collection of all the values from this instance's EnchantmentData map.
-     */
-    public @NotNull Collection<EnchantmentData> getAllEnchantmentData() {
-        return Collections.unmodifiableCollection(this.data.values());
-    }
-
-    /**
-     * Removes the provided key from this manager.
-     * @param key The key to remove
-     */
-    public void removeEnchantmentData(@NotNull NamespaceID key) {
-        this.data.remove(key);
-    }
-
-    /**
-     * Associates the provided material with the value.
-     * @param material The material to set
-     * @param value The value to associate with the material
-     */
-    public void putEnchantability(@NotNull Material material, @NotNull Integer value) {
-        this.enchantability.put(material, value);
+        return this.enchantmentData.get(key);
     }
 
     /**
@@ -320,16 +280,8 @@ public class EnchantmentManager {
      * @param material The material to search for
      * @return The enchantability value for the provided material
      */
-    public @Nullable Integer getEnchantability(@NotNull Material material) {
-        return this.enchantability.get(material);
-    }
-
-    /**
-     * Removes the provided material from this manager's enchantability map.
-     * @param material The material to remove
-     */
-    public void removeEnchantability(@NotNull Material material) {
-        this.enchantability.remove(material);
+    public int getEnchantability(@NotNull Material material) {
+        return this.enchantability.getOrDefault(material, 0);
     }
 
 }

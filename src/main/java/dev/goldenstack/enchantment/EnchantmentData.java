@@ -1,5 +1,8 @@
 package dev.goldenstack.enchantment;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.Material;
 import net.minestom.server.utils.NamespaceID;
@@ -68,7 +71,7 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
     /**
      * @return the default (and immutable) map of default enchantability data
      */
-    public static @NotNull Map<Material, Integer> getDefaultEnchantability() {
+    public static @NotNull Object2IntMap<Material> getDefaultEnchantability() {
         return DEFAULT_ENCHANTABILITY;
     }
 
@@ -113,62 +116,36 @@ public record EnchantmentData(@NotNull Enchantment enchantment, int weight, @Not
             Map.entry(Enchantment.CHANNELING.namespace(), new EnchantmentData(Enchantment.CHANNELING, 1, SlotType::TRIDENT, multiply(25), constant(50)))
     );
 
-    // Including these supposedly helps speed up compilation and analysis
-    private static final @NotNull Map<Material, Integer> DEFAULT_ENCHANTABILITY = Map.<Material, Integer>ofEntries(
-            Map.entry(Material.TRIDENT, 1),
-            Map.entry(Material.BOOK, 1),
-            Map.entry(Material.FISHING_ROD, 1),
-            Map.entry(Material.BOW, 1),
-            Map.entry(Material.CROSSBOW, 1),
-            Map.entry(Material.LEATHER_HELMET, 15),
-            Map.entry(Material.LEATHER_CHESTPLATE, 15),
-            Map.entry(Material.LEATHER_LEGGINGS, 15),
-            Map.entry(Material.LEATHER_BOOTS, 15),
-            Map.entry(Material.CHAINMAIL_HELMET, 12),
-            Map.entry(Material.CHAINMAIL_CHESTPLATE, 12),
-            Map.entry(Material.CHAINMAIL_LEGGINGS, 12),
-            Map.entry(Material.CHAINMAIL_BOOTS, 12),
-            Map.entry(Material.IRON_HELMET, 9),
-            Map.entry(Material.IRON_CHESTPLATE, 9),
-            Map.entry(Material.IRON_LEGGINGS, 9),
-            Map.entry(Material.IRON_BOOTS, 9),
-            Map.entry(Material.GOLDEN_HELMET, 25),
-            Map.entry(Material.GOLDEN_CHESTPLATE, 25),
-            Map.entry(Material.GOLDEN_LEGGINGS, 25),
-            Map.entry(Material.GOLDEN_BOOTS, 25),
-            Map.entry(Material.DIAMOND_HELMET, 10),
-            Map.entry(Material.DIAMOND_CHESTPLATE, 10),
-            Map.entry(Material.DIAMOND_LEGGINGS, 10),
-            Map.entry(Material.DIAMOND_BOOTS, 10),
-            Map.entry(Material.TURTLE_HELMET, 9),
-            Map.entry(Material.NETHERITE_HELMET, 15),
-            Map.entry(Material.NETHERITE_CHESTPLATE, 15),
-            Map.entry(Material.NETHERITE_LEGGINGS, 15),
-            Map.entry(Material.NETHERITE_BOOTS, 15),
-            Map.entry(Material.WOODEN_SWORD, 15),
-            Map.entry(Material.WOODEN_PICKAXE, 15),
-            Map.entry(Material.WOODEN_AXE, 15),
-            Map.entry(Material.WOODEN_SHOVEL, 15),
-            Map.entry(Material.WOODEN_HOE, 15),
-            Map.entry(Material.STONE_SWORD, 5),
-            Map.entry(Material.STONE_PICKAXE, 5),
-            Map.entry(Material.STONE_AXE, 5),
-            Map.entry(Material.STONE_SHOVEL, 5),
-            Map.entry(Material.STONE_HOE, 5),
-            Map.entry(Material.IRON_SWORD, 14),
-            Map.entry(Material.IRON_PICKAXE, 14),
-            Map.entry(Material.IRON_AXE, 14),
-            Map.entry(Material.IRON_SHOVEL, 14),
-            Map.entry(Material.IRON_HOE, 14),
-            Map.entry(Material.DIAMOND_SWORD, 10),
-            Map.entry(Material.DIAMOND_PICKAXE, 10),
-            Map.entry(Material.DIAMOND_AXE, 10),
-            Map.entry(Material.DIAMOND_SHOVEL, 10),
-            Map.entry(Material.DIAMOND_HOE, 10),
-            Map.entry(Material.NETHERITE_SWORD, 15),
-            Map.entry(Material.NETHERITE_PICKAXE, 15),
-            Map.entry(Material.NETHERITE_AXE, 15),
-            Map.entry(Material.NETHERITE_SHOVEL, 15),
-            Map.entry(Material.NETHERITE_HOE, 15)
-    );
+    private static final @NotNull Object2IntMap<Material> DEFAULT_ENCHANTABILITY;
+
+    static {
+        Object2IntMap<Material> enchantability = new Object2IntOpenHashMap<>();
+
+        // Misc
+        putMap(enchantability, 1, Material.TRIDENT, Material.BOOK, Material.FISHING_ROD, Material.BOW, Material.CROSSBOW);
+
+        // Armor
+        putMap(enchantability, 15, Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS);
+        putMap(enchantability, 12, Material.CHAINMAIL_HELMET, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_LEGGINGS, Material.CHAINMAIL_BOOTS);
+        putMap(enchantability, 9, Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS);
+        putMap(enchantability, 25, Material.GOLDEN_HELMET, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_LEGGINGS, Material.GOLDEN_BOOTS);
+        putMap(enchantability, 10, Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS);
+        putMap(enchantability, 15, Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS);
+        putMap(enchantability, 9, Material.TURTLE_HELMET);
+
+        // Tools
+        putMap(enchantability, 15, Material.WOODEN_SWORD, Material.WOODEN_PICKAXE, Material.WOODEN_AXE, Material.WOODEN_SHOVEL, Material.WOODEN_HOE);
+        putMap(enchantability, 5, Material.STONE_SWORD, Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_SHOVEL, Material.STONE_HOE);
+        putMap(enchantability, 14, Material.IRON_SWORD, Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_SHOVEL, Material.IRON_HOE);
+        putMap(enchantability, 10, Material.DIAMOND_SWORD, Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_SHOVEL, Material.DIAMOND_HOE);
+        putMap(enchantability, 15, Material.NETHERITE_SWORD, Material.NETHERITE_PICKAXE, Material.NETHERITE_AXE, Material.NETHERITE_SHOVEL, Material.NETHERITE_HOE);
+
+        DEFAULT_ENCHANTABILITY = Object2IntMaps.unmodifiable(enchantability);
+    }
+
+    private static void putMap(@NotNull Object2IntMap<Material> map, int value, @NotNull Material @NotNull ... materials) {
+        for (var material : materials) {
+            map.put(material, value);
+        }
+    }
 }
