@@ -43,7 +43,7 @@ import java.util.function.Predicate;
  * <br>
  * Here is some correct but extremely unorthodox code so you can see an example. Since this is just example code, it's
  * not a good idea to actually use this example for anything.<br>
- * <code>new EnchantmentManager(true, true).enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(),
+ * <code>EnchantmentManager.fromDefaults().enchantWithLevels(ItemStack.of(Material.DIAMOND_SWORD), 30, new Random(),
  * EnchantmentManager::discoverableAndNotTreasure, EnchantmentManager::alwaysAddIfBook)</code>
  */
 public record EnchantmentManager(@NotNull Map<NamespaceID, EnchantmentData> enchantmentData,
