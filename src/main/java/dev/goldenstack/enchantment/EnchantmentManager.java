@@ -22,7 +22,7 @@ import java.util.function.Predicate;
  * Each instance stores its own enchantability and EnchantmentData maps, so other extensions can't mess up yours if you
  * don't want them to.<br>
  * <br>
- * <h3>Guide to implementing default Minecraft enchanting</h3>
+ * Guide to implementing default Minecraft enchanting<br>
  * Just initialize a new manager with both parameters as true if you want the default values for everything.
  * Run {@link EnchantmentManager#enchantWithLevels(ItemStack, int, Random, Predicate, Predicate)
  * manager.enchantWithLevels(itemStack, levels, random, enchantmentPredicate, alwaysAddPredicate} where:
@@ -67,8 +67,8 @@ public record EnchantmentManager(@NotNull Map<NamespaceID, EnchantmentData> ench
     }
 
     /**
-     * This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this class
-     * (with the name "enchantmentPredicate").<br>
+     * This is meant to act as an argument when you need to pass a Predicate&lt;EnchantmentData&gt; into methods of this
+     * class (with the name "enchantmentPredicate").<br>
      * In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
      * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.<br>
      * This predicate acts identically to if you want to enchant an item and accept both treasure and non-treasure
@@ -79,8 +79,8 @@ public record EnchantmentManager(@NotNull Map<NamespaceID, EnchantmentData> ench
     }
 
     /**
-     * This is meant to act as an argument when you need to pass a Predicate<EnchantmentData> into methods of this class
-     * (with the name "enchantmentPredicate").<br>
+     * This is meant to act as an argument when you need to pass a Predicate&lt;EnchantmentData&gt; into methods of this
+     * class (with the name "enchantmentPredicate").<br>
      * In default Minecraft, you cannot get any non-discoverable enchantments from any enchantment mechanism. Since
      * that's a restriction that you may not want, you can decide if you want to use it or not, via this predicate.<br>
      * This predicate acts identically to if you want to enchant an item and accept only non-treasure enchantments. For
@@ -91,8 +91,8 @@ public record EnchantmentManager(@NotNull Map<NamespaceID, EnchantmentData> ench
     }
 
     /**
-     * This is meant to act as an argument when you need to pass a Predicate<ItemStack> into methods of this class (with
-     * the name "alwaysAddPredicate").<br>
+     * This is meant to act as an argument when you need to pass a Predicate&lt;ItemStack&gt; into methods of this class
+     * (with the name "alwaysAddPredicate").<br>
      * In default Minecraft, enchantments can only be added to items if the enchantment's slot type applies to the item
      * - except if the item is a book. If it's a book, all enchantments will work, and it will be converted to an
      * enchanted book. Since this isn't default Minecraft, you'll have to convert it to an enchanted book yourself if
